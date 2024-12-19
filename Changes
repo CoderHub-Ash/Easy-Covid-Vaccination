@@ -1,4 +1,4 @@
-<div class="form-group">
+<div #parent class="form-group">
   <label for="txtOB">Other Benchmark/s BBG Code</label>
   <div class="tag-container">
     <tag-input 
@@ -14,32 +14,31 @@
       placeholder="Other Benchmark BBG Code"
       secondaryPlaceholder="Other Benchmark BBG Code"
       [separatorKeyCodes]="[9, 13, 186, 188, 189, 190, 17]" 
-    >
-      <button class="add-button" (click)="showAddBenchmarkPopup = true"> 
-        <mat-icon>add</mat-icon>
-      </button>
-    </tag-input>
+    ></tag-input>
+
+    <button class="add-button" (click)="showAddBenchmarkPopup = true"> 
+      <mat-icon>add</mat-icon>
+    </button>
+  </div>
+
+  <div *ngIf="showAddBenchmarkPopup" class="popup">
+    <div class="popup-content">
+      <label for="otherBenchmarkInput">Please input the BBG code:</label>
+      <input 
+        id="otherBenchmarkInput"
+        type="text"
+        [formControl]="otherBenchmarkControl"
+        [matAutocomplete]="auto"
+      />
+      <mat-autocomplete #auto="matAutocomplete" (optionSelected)="addBenchmarkFromPopup($event)">
+        <mat-option *ngFor="let option of filteredOtherBenchmarkOptions | async" [value]="option">
+          {{ option.bbgCode }} | {{ option.mdsCode }} | {{ option.cinergyCode }}
+        </mat-option>
+      </mat-autocomplete>
+      <button class="close-popup-button" (click)="showAddBenchmarkPopup = false">Close</button>
+    </div>
   </div>
 </div>
-
-<div *ngIf="showAddBenchmarkPopup" class="popup">
-  <div class="popup-content">
-    <input 
-      type="text"
-      [formControl]="otherBenchmarkControl"
-      [matAutocomplete]="auto"
-      (keyup.enter)="addBenchmarkFromPopup()" 
-    />
-    <mat-autocomplete #auto="matAutocomplete" (optionSelected)="addBenchmarkFromPopup($event)">
-      <mat-option *ngFor="let option of filteredOtherBenchmarkOptions | async" [value]="option">
-        {{ option.bbgCode }} | {{ option.mdsCode }} | {{ option.cinergyCode }}
-      </mat-option>
-    </mat-autocomplete>
-    <button class="close-popup-button" (click)="showAddBenchmarkPopup = false">Close</button> 
-  </div>
-</div>
-
-
 
 
 /* Style the tag input container */
@@ -50,28 +49,36 @@
   padding: 5px; 
 }
 
-/* Style the tags */
-.tag {
-  background-color: #e0e0e0;
-  padding: 5px 10px;
-  margin-right: 5px;
-  border-radius: 20px; 
-  display: flex;
-  align-items: center; 
-}
-
-/* Style the close button inside the tag */
-.tag .close-button {
-  margin-left: 5px; 
-  border: none;
-  background: none;
-  cursor: pointer;
-}
-
 /* Style the add button */
 .add-button {
   border: none; 
   background: none; 
   cursor: pointer;
-  margin-left: auto; 
+  margin-left: 10px; /* Adjust the margin as needed */
+}
+
+
+// ... other imports
+
+@Component({
+  // ...
+})
+export class EditComponent implements OnInit {
+  // ... other properties
+
+  showAddBenchmarkPopup = false;
+
+  // ...
+
+  // ... (No changes needed in ngOnInit)
+
+  addBenchmarkFromPopup(event?: MatAutocompleteSelectedEvent) {
+    // ... (same logic as before)
+  }
+
+  removeBenchmark(benchmark: any) {
+    // ... (same logic as before)
+  }
+
+  // ... your existing onSubmit method ...
 }
