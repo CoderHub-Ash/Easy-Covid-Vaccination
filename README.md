@@ -134,3 +134,34 @@ addBenchmark(event: MatChipInputEvent): void {
 
   this.otherBenchmarkCtrl.setValue(null);
 }
+
+
+
+
+<mat-form-field>
+  <mat-label>Other Benchmark/s BBG Code</mat-label>
+  <mat-chip-list #chipList aria-label="Other Benchmark selection">
+    <mat-chip
+      *ngFor="let benchmark of selectedOtherBenchmarks"
+      (removed)="removeBenchmark(benchmark)">
+      {{benchmark.bbgCode}}
+      <button matChipRemove>
+        <mat-icon>cancel</mat-icon>
+      </button>
+    </mat-chip>
+    <input
+      placeholder="Other Benchmark BBG Code"
+      #otherBenchmarkInput
+      [formControl]="otherBenchmarkControl"
+      [matAutocomplete]="auto"
+      [matChipInputFor]="chipList" 
+      [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+      (matChipInputTokenEnd)="addBenchmark($event)"
+    />
+  </mat-chip-list>
+  <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selectedBenchmark($event)">
+    <mat-option *ngFor="let option of filteredOtherBenchmarkOptions | async" [value]="option">
+      {{ option.bbgCode }} | {{ option.mdsCode }} | {{ option.cinergyCode }}
+    </mat-option>
+  </mat-autocomplete>
+</mat-form-field>
