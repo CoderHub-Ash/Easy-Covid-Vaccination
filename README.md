@@ -43,3 +43,75 @@ The major problem with the current vaccination process is that even when the reg
     </mat-option>
   </mat-autocomplete>
 </mat-form-field>
+
+
+
+
+
+
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { FormControl } from '@angular/forms';
+import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { MatChipInputEvent } from '@angular/material/chips';
+import { Observable, of, map, startWith, debounceTime, switchMap } from 'rxjs';
+import { COMMA, ENTER } from '@angular/cdk/keycodes';
+
+// ... other imports
+
+@Component({
+  // ...
+})
+export class EditComponent implements OnInit {
+  // ... other properties
+
+  separatorKeysCodes: number[] = [ENTER, COMMA]; 
+  otherBenchmarkCtrl = new FormControl('');
+  filteredOtherBenchmarkOptions: Observable<any[]>; 
+  selectedOtherBenchmarks: any[] = []; 
+
+  // ...
+
+  ngOnInit() {
+    // ... your existing code ...
+
+    this.filteredOtherBenchmarkOptions = this.otherBenchmarkCtrl.valueChanges.pipe(
+      startWith(null),
+      debounceTime(300),
+      switchMap((value: string | null) => {
+        if (typeof value === 'string' && value.length >= 3) {
+          return this.fetchOptions(value);
+        } else {
+          return of([]);
+        }
+      })
+    );
+  }
+
+  addBenchmark(event: MatChipInputEvent): void {
+    const value = (event.value || '').trim();
+
+    // Add benchmark if value exists and not a duplicate
+    if (value && !this.selectedOtherBenchmarks.some(benchmark => benchmark.bbgCode === value)) {
+      this.selectedOtherBenchmarks.push({ bbgCode: value }); // Assuming you only want to add bbgCode
+    }
+
+    event.chipInput!.clear();
+    this.otherBenchmarkCtrl.setValue(null);
+  }
+
+  removeBenchmark(benchmark: any): void {
+    const index = this.selectedOtherBenchmarks.indexOf(benchmark);
+
+    if (index >= 0) {
+      this.selectedOtherBenchmarks.splice(index, 1);
+    }
+  }
+
+  selectedBenchmark(event: MatAutocompleteSelectedEvent): void {
+    this.selectedOtherBenchmarks.push(event.option.viewValue);
+    this.otherBenchmarkInput.nativeElement.value = '';
+    this.otherBenchmarkCtrl.setValue(null);
+  }
+
+  // ... rest of your component code
+}
