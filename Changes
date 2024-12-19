@@ -1,0 +1,48 @@
+import { Component, OnInit } from '@angular/core';
+import { FormControl } from '@angular/forms';
+import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { Observable, of } from 'rxjs';
+import { startWith, debounceTime, switchMap } from 'rxjs/operators';
+import { COMMA, ENTER } from '@angular/cdk/keycodes';
+
+// ... other imports
+
+@Component({
+  // ...
+})
+export class EditComponent implements OnInit {
+  // ... other properties
+
+  separatorKeysCodes: number[] = [ENTER, COMMA]; // Define your separator key codes
+  otherBenchmarkControl = new FormControl('');
+  filteredOtherBenchmarkOptions: Observable<any[]>;
+  selectedOtherBenchmarks: any[] = [];
+
+  // ...
+
+  ngOnInit() {
+    // ... your existing code ...
+
+    this.filteredOtherBenchmarkOptions = this.otherBenchmarkControl.valueChanges.pipe(
+      startWith(''),
+      debounceTime(300),
+      switchMap(value => value.length >= 3 ? this.fetchOptions(value) : of([]))
+    );
+  }
+
+  onKeyUp(event: KeyboardEvent) {
+    if (this.separatorKeysCodes.includes(event.keyCode)) {
+      const inputValue = this.otherBenchmarkControl.value;
+      if (inputValue && !this.selectedOtherBenchmarks.some(benchmark => benchmark.bbgCode === inputValue)) {
+        this.selectedOtherBenchmarks.push({ bbgCode: inputValue });
+        this.otherBenchmarkControl.setValue('');
+      }
+    }
+  }
+
+  onOtherBenchmarkSelected(event: MatAutocompleteSelectedEvent) {
+    // ... your existing code ...
+  }
+
+  // ... your existing onSubmit method ...
+}
