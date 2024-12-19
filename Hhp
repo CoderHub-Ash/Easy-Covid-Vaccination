@@ -1,0 +1,136 @@
+<div class="modal-header-custom">
+  <h4 class="modal-title">Add Benchmark</h4>
+  <button type="button" class="close" aria-label="Close" (click)="closeModal.emit()">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div class="modal-body">
+  <div class="form-group">
+    <label for="otherBenchmarkInput">BBG Code</label>
+    <input
+      id="otherBenchmarkInput"
+      type="text"
+      class="form-control"
+      [formControl]="otherBenchmarkControl"
+      [matAutocomplete]="auto"
+      (keyup.enter)="addBenchmark()"
+    />
+    <mat-autocomplete #auto="matAutocomplete" (optionSelected)="addBenchmark($event)">
+      <mat-option *ngFor="let option of filteredOtherBenchmarkOptions | async" [value]="option">
+        {{ option.bbgCode }} | {{ option.mdsCode }} | {{ option.cinergyCode }}
+      </mat-option>
+    </mat-autocomplete>
+  </div>
+  <div *ngFor="let benchmark of otherBenchmarks; let i = index">
+    <span>{{ benchmark.bbgCode }}</span>
+    <button type="button" (click)="removeBenchmark(benchmark)">
+      <mat-icon>remove</mat-icon>
+    </button>
+  </div>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-secondary" (click)="closeModal.emit()">Close</button>
+</div>
+
+
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { FormControl } from '@angular/forms';
+import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { Observable, of } from 'rxjs';
+import { startWith, debounceTime, switchMap } from 'rxjs/operators';
+
+@Component({
+  selector: 'app-other-benchmark-popup',
+  templateUrl: './other-benchmark-popup.component.html',
+  styleUrls: ['./other-benchmark-popup.component.scss']
+})
+export class OtherBenchmarkPopupComponent implements OnInit {
+  @Input() otherBenchmarks: any[] = [];
+  @Output() otherBenchmarksChange = new EventEmitter<any[]>();
+
+  otherBenchmarkControl = new FormControl('');
+  filteredOtherBenchmarkOptions: Observable<any[]>;
+
+  constructor() { }
+
+  ngOnInit(): void {
+    this.filteredOtherBenchmarkOptions = this.otherBenchmarkControl.valueChanges.pipe(
+      startWith(''),
+      debounceTime(300),
+      switchMap(value => value.length >= 3 ? this.fetchOptions(value) : of([]))
+    );
+  }
+
+  fetchOptions(value: string): Observable<any[]> {
+    // Replace this with your actual API call to fetch options
+    // This is just a dummy example
+    const options = [
+      { bbgCode: 'BBG123', mdsCode: 'MDS456', cinergyCode: 'CIN789' },
+      { bbgCode: 'BBG987', mdsCode: 'MDS654', cinergyCode: 'CIN321' },
+      // ... more options
+    ];
+    return of(options.filter(option => option.bbgCode.toLowerCase().includes(value.toLowerCase())));
+  }
+
+  addBenchmark(event?: MatAutocompleteSelectedEvent) {
+    let newBenchmark = null;
+    if (event) {
+      newBenchmark = event.option.value;
+    } else {
+      const inputValue = this.otherBenchmarkControl.value;
+      if (inputValue) {
+        // You might need to fetch the full benchmark object here based on inputValue
+        newBenchmark = { bbgCode: inputValue, /* ... other properties */ };
+      }
+    }
+
+    if (newBenchmark) {
+      this.otherBenchmarks.push(newBenchmark);
+      this.otherBenchmarksChange.emit(this.otherBenchmarks);
+      this.otherBenchmarkControl.setValue('');
+    }
+  }
+
+  removeBenchmark(benchmark: any) {
+    const index = this.otherBenchmarks.indexOf(benchmark);
+    if (index > -1) {
+      this.otherBenchmarks.splice(index, 1);
+      this.otherBenchmarksChange.emit(this.otherBenchmarks);
+    }
+  }
+}
+
+
+
+/* You can add your styles here */
+.modal-header-custom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+
+
+
+
+<app-other-benchmark-popup 
+  *ngIf="showAddBenchmarkPopup"
+  [(otherBenchmarks)]="publication.otherBenchmark"
+  (closeModal)="showAddBenchmarkPopup = false"
+>
+</app-other-benchmark-popup>
+
+
+
+
+
+// other-benchmark-popup.component.ts
+@Component({
+  selector: 'app-other-benchmark-popup', 
+  // ...
+})
+export class OtherBenchmarkPopupComponent {
+  // ...
+}
+
+
