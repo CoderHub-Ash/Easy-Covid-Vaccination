@@ -115,3 +115,22 @@ export class EditComponent implements OnInit {
 
   // ... rest of your component code
 }
+
+
+
+addBenchmark(event: MatChipInputEvent): void {
+  const value = (event.value || '').trim();
+
+  // Add benchmark if value exists and not a duplicate
+  if (value && !this.selectedOtherBenchmarks.some(benchmark => benchmark.bbgCode === value)) {
+    this.selectedOtherBenchmarks.push({ bbgCode: value }); 
+  }
+
+  // Access chipInput from the input element
+  const input = event.input;
+  if (input) {
+    input.value = '';
+  }
+
+  this.otherBenchmarkCtrl.setValue(null);
+}
