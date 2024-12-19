@@ -1,0 +1,52 @@
+<div #parent class="form-group">
+  <label for="txtOB">Other Benchmark/s BBG Code</label>
+  <div class="tag-container">
+    <tag-input 
+      #tagInput
+      name="txtOB"
+      id="txtOB"
+      [ngModel]="publication.otherBenchmark"
+      (ngModelChange)="publication.otherBenchmark = $event"
+      (tagAdded)="onOtherBenchmarkTagAdded($event)" 
+      (tagRemoved)="onOtherBenchmarkTagRemoved($event)"
+      [class]="validation.isValidOB == false ? 'form-control BBGvalidation' : 'form-control'"
+      theme="bnpparibas"
+      placeholder="Other Benchmark BBG Code"
+      secondaryPlaceholder="Other Benchmark BBG Code"
+      [separatorKeyCodes]="[9, 13, 186, 188, 189, 190, 17]" 
+    ></tag-input>
+
+    <button class="add-button" (click)="showAddBenchmarkPopup = true"> 
+      <mat-icon>add</mat-icon>
+    </button>
+  </div>
+
+  <jw-modal id="mdlAddBenchmarkPopup" *ngIf="showAddBenchmarkPopup" [modalClass]="'modal-xl'"> 
+    <div class="modal-header-custom">
+      <h4 class="modal-title">Add Benchmark</h4> 
+      <button type="button" class="close" aria-label="Close" (click)="showAddBenchmarkPopup = false">
+        <span aria-hidden="true">&times;</span> 
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label for="otherBenchmarkInput">BBG Code</label> 
+        <input 
+          id="otherBenchmarkInput"
+          type="text"
+          class="form-control" 
+          [formControl]="otherBenchmarkControl"
+          [matAutocomplete]="auto"
+        />
+        <mat-autocomplete #auto="matAutocomplete" (optionSelected)="addBenchmarkFromPopup($event)">
+          <mat-option *ngFor="let option of filteredOtherBenchmarkOptions | async" [value]="option">
+            {{ option.bbgCode }} | {{ option.mdsCode }} | {{ option.cinergyCode }}
+          </mat-option>
+        </mat-autocomplete>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="showAddBenchmarkPopup = false">Close</button> 
+    </div>
+  </jw-modal>
+</div>
