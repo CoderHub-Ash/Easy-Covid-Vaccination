@@ -1,9 +1,47 @@
-import { Component, OnInit } from '@angular/core';
-import { FormControl } from '@angular/forms';
-import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
-import { Observable, of } from 'rxjs';
-import { startWith, debounceTime, switchMap } from 'rxjs/operators';
-import { COMMA, ENTER } from '@angular/cdk/keycodes';
+<div class="form-group">
+  <label for="txtOB">Other Benchmark/s BBG Code</label> 
+  <div class="tag-container"> 
+    <tag-input 
+      #tagInput
+      name="txtOB"
+      id="txtOB"
+      [ngModel]="publication.otherBenchmark"
+      (ngModelChange)="publication.otherBenchmark = $event"
+      (tagAdded)="onOtherBenchmarkTagAdded($event)" 
+      (tagRemoved)="onOtherBenchmarkTagRemoved($event)"
+      [class]="validation.isValidOB == false ? 'form-control BBGvalidation' : 'form-control'"
+      theme="bnpparibas"
+      placeholder="Other Benchmark BBG Code"
+      secondaryPlaceholder="Other Benchmark BBG Code"
+      [separatorKeyCodes]="[9, 13, 186, 188, 189, 190, 17]" 
+    >
+      <button class="add-button" (click)="showAddBenchmarkPopup = true">
+        <mat-icon>add</mat-icon> 
+      </button>
+    </tag-input>
+  </div>
+</div>
+
+<div *ngIf="showAddBenchmarkPopup" class="popup">
+  <div class="popup-content">
+    <input 
+      type="text"
+      [formControl]="otherBenchmarkControl"
+      [matAutocomplete]="auto"
+      (keyup.enter)="addBenchmarkFromPopup()" 
+    />
+    <mat-autocomplete #auto="matAutocomplete" (optionSelected)="addBenchmarkFromPopup($event)">
+      <mat-option *ngFor="let option of filteredOtherBenchmarkOptions | async" [value]="option">
+        {{ option.bbgCode }} | {{ option.mdsCode }} | {{ option.cinergyCode }}
+      </mat-option>
+    </mat-autocomplete>
+    <button class="close-popup-button" (click)="showAddBenchmarkPopup = false">Close</button>
+  </div>
+</div>
+
+
+
+
 
 // ... other imports
 
@@ -13,7 +51,7 @@ import { COMMA, ENTER } from '@angular/cdk/keycodes';
 export class EditComponent implements OnInit {
   // ... other properties
 
-  separatorKeysCodes: number[] = [ENTER, COMMA]; // Define your separator key codes
+  showAddBenchmarkPopup = false;
   otherBenchmarkControl = new FormControl('');
   filteredOtherBenchmarkOptions: Observable<any[]>;
   selectedOtherBenchmarks: any[] = [];
@@ -30,19 +68,38 @@ export class EditComponent implements OnInit {
     );
   }
 
-  onKeyUp(event: KeyboardEvent) {
-    if (this.separatorKeysCodes.includes(event.keyCode)) {
+  addBenchmarkFromPopup(event?: MatAutocompleteSelectedEvent) {
+    let selectedOption = null;
+    if (event) {
+      selectedOption = event.option.value;
+    } else {
       const inputValue = this.otherBenchmarkControl.value;
-      if (inputValue && !this.selectedOtherBenchmarks.some(benchmark => benchmark.bbgCode === inputValue)) {
-        this.selectedOtherBenchmarks.push({ bbgCode: inputValue });
-        this.otherBenchmarkControl.setValue('');
+      if (inputValue) {
+        selectedOption = { bbgCode: inputValue }; 
       }
+    }
+
+    if (selectedOption && !this.selectedOtherBenchmarks.some(benchmark => benchmark.bbgCode === selectedOption.bbgCode)) {
+      this.selectedOtherBenchmarks.push(selectedOption);
+      this.otherBenchmarkControl.setValue('');
+      this.showAddBenchmarkPopup = false;
+
+      // (Optional) Update publication.otherBenchmark if needed
+      this.publication.otherBenchmark = this.selectedOtherBenchmarks.map(item => item.bbgCode);
     }
   }
 
-  onOtherBenchmarkSelected(event: MatAutocompleteSelectedEvent) {
-    // ... your existing code ...
+  removeBenchmark(benchmark: any): void {
+    const index = this.selectedOtherBenchmarks.indexOf(benchmark);
+    if (index > -1) {
+      this.selectedOtherBenchmarks.splice(index, 1);
+
+      // (Optional) Update publication.otherBenchmark if needed
+      this.publication.otherBenchmark = this.selectedOtherBenchmarks.map(item => item.bbgCode);
+    }
   }
 
   // ... your existing onSubmit method ...
 }
+
+
