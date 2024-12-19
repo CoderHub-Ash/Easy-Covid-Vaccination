@@ -1,6 +1,6 @@
 <div class="form-group">
-  <label for="txtOB">Other Benchmark/s BBG Code</label> 
-  <div class="tag-container"> 
+  <label for="txtOB">Other Benchmark/s BBG Code</label>
+  <div class="tag-container">
     <tag-input 
       #tagInput
       name="txtOB"
@@ -15,8 +15,8 @@
       secondaryPlaceholder="Other Benchmark BBG Code"
       [separatorKeyCodes]="[9, 13, 186, 188, 189, 190, 17]" 
     >
-      <button class="add-button" (click)="showAddBenchmarkPopup = true">
-        <mat-icon>add</mat-icon> 
+      <button class="add-button" (click)="showAddBenchmarkPopup = true"> 
+        <mat-icon>add</mat-icon>
       </button>
     </tag-input>
   </div>
@@ -35,71 +35,43 @@
         {{ option.bbgCode }} | {{ option.mdsCode }} | {{ option.cinergyCode }}
       </mat-option>
     </mat-autocomplete>
-    <button class="close-popup-button" (click)="showAddBenchmarkPopup = false">Close</button>
+    <button class="close-popup-button" (click)="showAddBenchmarkPopup = false">Close</button> 
   </div>
 </div>
 
 
 
 
-
-// ... other imports
-
-@Component({
-  // ...
-})
-export class EditComponent implements OnInit {
-  // ... other properties
-
-  showAddBenchmarkPopup = false;
-  otherBenchmarkControl = new FormControl('');
-  filteredOtherBenchmarkOptions: Observable<any[]>;
-  selectedOtherBenchmarks: any[] = [];
-
-  // ...
-
-  ngOnInit() {
-    // ... your existing code ...
-
-    this.filteredOtherBenchmarkOptions = this.otherBenchmarkControl.valueChanges.pipe(
-      startWith(''),
-      debounceTime(300),
-      switchMap(value => value.length >= 3 ? this.fetchOptions(value) : of([]))
-    );
-  }
-
-  addBenchmarkFromPopup(event?: MatAutocompleteSelectedEvent) {
-    let selectedOption = null;
-    if (event) {
-      selectedOption = event.option.value;
-    } else {
-      const inputValue = this.otherBenchmarkControl.value;
-      if (inputValue) {
-        selectedOption = { bbgCode: inputValue }; 
-      }
-    }
-
-    if (selectedOption && !this.selectedOtherBenchmarks.some(benchmark => benchmark.bbgCode === selectedOption.bbgCode)) {
-      this.selectedOtherBenchmarks.push(selectedOption);
-      this.otherBenchmarkControl.setValue('');
-      this.showAddBenchmarkPopup = false;
-
-      // (Optional) Update publication.otherBenchmark if needed
-      this.publication.otherBenchmark = this.selectedOtherBenchmarks.map(item => item.bbgCode);
-    }
-  }
-
-  removeBenchmark(benchmark: any): void {
-    const index = this.selectedOtherBenchmarks.indexOf(benchmark);
-    if (index > -1) {
-      this.selectedOtherBenchmarks.splice(index, 1);
-
-      // (Optional) Update publication.otherBenchmark if needed
-      this.publication.otherBenchmark = this.selectedOtherBenchmarks.map(item => item.bbgCode);
-    }
-  }
-
-  // ... your existing onSubmit method ...
+/* Style the tag input container */
+.tag-container {
+  display: flex;
+  align-items: center; 
+  border: 1px solid #ccc; 
+  padding: 5px; 
 }
 
+/* Style the tags */
+.tag {
+  background-color: #e0e0e0;
+  padding: 5px 10px;
+  margin-right: 5px;
+  border-radius: 20px; 
+  display: flex;
+  align-items: center; 
+}
 
+/* Style the close button inside the tag */
+.tag .close-button {
+  margin-left: 5px; 
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+/* Style the add button */
+.add-button {
+  border: none; 
+  background: none; 
+  cursor: pointer;
+  margin-left: auto; 
+}
