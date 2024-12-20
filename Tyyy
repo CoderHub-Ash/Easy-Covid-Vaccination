@@ -1,0 +1,99 @@
+<div class="input-button-form">
+  <tag-input
+    id="txtOB"
+    name="txtOB"
+    #txtOB="ngModel"
+    [(ngModel)]="publication.otherBenchmark"
+    (onRemove)="onOtherBenchmarkTagRemoved($event)"
+    [class]="validation.isvalidOB == false ? 'form-control BBGvalidation' : 'form-control'"
+    theme="bnptheme"
+    placeholder="+ Other Benchmark BBG Code"
+    secondaryPlaceholder="Other Benchmark BBG Code"
+    [separatorKeyCodes]="[9, 13, 186, 188, 189, 190, 17]"
+  >
+    <!-- Custom Dropdown Component for Autocomplete -->
+    <div class="custom-dropdown" *ngIf="showDropdown">
+      <div class="dropdown-item" *ngFor="let option of filteredOptionsList" (click)="selectOption(option)">
+        {{ option.bbgCode }} | {{ option.mdsCode }} | {{ option.cinergyCode }}
+      </div>
+    </div>
+  </tag-input>
+
+  <!-- Your existing aggregation index component -->
+  <app-aggregation-index
+    id="app-aggregation-index-otherbenchmark"
+    type="otherBenchmark"
+    [(otherBenchmark)]="publication.otherBenchmark"
+    [(publication)]="publication"
+    [aggregationIndexList]="publication.aggregationIndexList"
+  >
+  </app-aggregation-index>
+</div>
+
+
+
+
+
+import { Component, OnInit, ElementRef, Renderer2, ViewChild } from '@angular/core';
+import { FormControl } from '@angular/forms';
+import { Observable, of } from 'rxjs';
+import { debounceTime, switchMap, map, startWith, catchError } from 'rxjs/operators';
+import { PublicationsService } from './publications.service'; // Adjust import according to your setup
+
+export interface AutoCompleteOptions {
+  bbgCode: string;
+  mdsCode: string;
+  cinergyCode: string;
+}
+
+@Component({
+  selector: 'app-other-benchmark',
+  templateUrl: './other-benchmark.component.html',
+  styleUrls: ['./other-benchmark.component.css'],
+})
+export class OtherBenchmarkComponent implements OnInit {
+  publication = { otherBenchmark: '', aggregationIndexList: [] };
+  otherBenchmarkControl = new FormControl('');
+  filteredOptionsList: AutoCompleteOptions[] = [];
+  showDropdown = false;
+
+  constructor(private publicationsService: PublicationsService, private renderer: Renderer2, private elRef: ElementRef) {}
+
+  ngOnInit(): void {
+    this.filteredOptionsList = [];
+    this.otherBenchmarkControl.valueChanges.pipe(
+      startWith(''),
+      debounceTime(300),
+      switchMap(value => value.length >= 3 ? this.fetchOptions(value) : of([]))
+    ).subscribe(options => {
+      this.filteredOptionsList = options;
+      this.showDropdown = options.length > 0;
+    });
+  }
+
+  fetchOptions(value: string): Observable<AutoCompleteOptions[]> {
+    return this.publicationsService.getAutocompleteOptions(value).pipe(
+      map(data => data.map(item => ({
+        bbgCode: item.bbgCode,
+        mdsCode: item.mdsCode,
+        cinergyCode: item.cinergyCode,
+      }))),
+      catchError(() => of([]))
+    );
+  }
+
+  selectOption(option: AutoCompleteOptions) {
+    this.publication.otherBenchmark = option.bbgCode; // or the appropriate field in your model
+    this.showDropdown = false;
+  }
+
+  onFocus() {
+    this.showDropdown = true;
+  }
+
+  onBlur() {
+    setTimeout(() => {
+      this.showDropdown = false;
+    }, 100);
+  }
+}
