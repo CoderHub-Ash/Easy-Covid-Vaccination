@@ -1,0 +1,36 @@
+<div class="input-button-form">
+  <tag-input
+    id="txtOB"
+    name="txtOB"
+    #txtOB="ngModel"
+    [(ngModel)]="publication.otherBenchmark"
+    (onRemove)="onOtherBenchmarkTagRemoved($event)"
+    [class]="validation.isvalidOB == false ? 'form-control BBGvalidation' : 'form-control'"
+    theme="bnptheme"
+    placeholder="+ Other Benchmark BBG Code"
+    secondaryPlaceholder="Other Benchmark BBG Code"
+    [separatorKeyCodes]="[9, 13, 186, 188, 189, 190, 17]"
+    (input)="onInputChange($event)"  <!-- Detect input changes -->
+    (blur)="onInputBlur()"             <!-- Blur event to hide dropdown -->
+  >
+    <!-- Custom Dropdown Component for Autocomplete -->
+    <mat-form-field appearance="outline" class="dropdown-container" *ngIf="showDropdown">
+      <mat-label>Options</mat-label>
+      <mat-select (selectionChange)="selectOption($event.value)">
+        <mat-option *ngFor="let option of filteredOptionsList" [value]="option">
+          {{ option.bbgCode }} | {{ option.mdsCode }} | {{ option.cinergyCode }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </tag-input>
+
+  <!-- Your existing aggregation index component -->
+  <app-aggregation-index
+    id="app-aggregation-index-otherbenchmark"
+    type="otherBenchmark"
+    [(otherBenchmark)]="publication.otherBenchmark"
+    [(publication)]="publication"
+    [aggregationIndexList]="publication.aggregationIndexList"
+  >
+  </app-aggregation-index>
+</div>
