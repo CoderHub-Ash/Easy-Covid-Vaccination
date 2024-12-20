@@ -1,0 +1,77 @@
+import { Component, OnInit, ElementRef, Renderer2, ViewChild } from '@angular/core';
+import { FormControl } from '@angular/forms';
+import { Observable, of } from 'rxjs';
+import { debounceTime, switchMap, map, startWith, catchError } from 'rxjs/operators';
+import { PublicationsService } from './publications.service'; // Adjust import according to your setup
+
+export interface AutoCompleteOptions {
+  bbgCode: string;
+  mdsCode: string;
+  cinergyCode: string;
+}
+
+@Component({
+  selector: 'app-other-benchmark',
+  templateUrl: './other-benchmark.component.html',
+  styleUrls: ['./other-benchmark.component.css'],
+})
+export class OtherBenchmarkComponent implements OnInit {
+  publication = { otherBenchmark: '', aggregationIndexList: [] };
+  otherBenchmarkControl = new FormControl('');
+  filteredOptionsList: AutoCompleteOptions[] = [];
+  showDropdown = false;
+
+  constructor(private publicationsService: PublicationsService, private renderer: Renderer2, private elRef: ElementRef) {}
+
+  ngOnInit(): void {
+    this.filteredOptionsList = [];
+    this.otherBenchmarkControl.valueChanges.pipe(
+      startWith(''),
+      debounceTime(300),
+      switchMap(value => value.length >= 3 ? this.fetchOptions(value) : of([]))
+    ).subscribe(options => {
+      this.filteredOptionsList = options;
+      this.showDropdown = options.length > 0;
+    });
+  }
+
+  fetchOptions(value: string): Observable<AutoCompleteOptions[]> {
+    return this.publicationsService.getAutocompleteOptions(value).pipe(
+      map(data => data.map(item => ({
+        bbgCode: item.bbgCode,
+        mdsCode: item.mdsCode,
+        cinergyCode: item.cinergyCode,
+      }))),
+      catchError(() => of([]))
+    );
+  }
+
+  selectOption(option: AutoCompleteOptions) {
+    this.publication.otherBenchmark = option.bbgCode; // or the appropriate field in your model
+    this.showDropdown = false;
+  }
+
+  onInputChange(event: any) {
+    // Show dropdown if the input has at least 3 characters
+    if (event.target.value.length >= 3) {
+      this.showDropdown = true;
+      this.filteredOptionsList = []; // Reset options list for new input
+      this.fetchOptions(event.target.value).subscribe(options => {
+        this.filteredOptionsList = options;
+      });
+    } else {
+      this.showDropdown = false;
+    }
+  }
+
+  onInputBlur() {
+    // Hide dropdown when input loses focus
+    setTimeout(() => {
+      this.showDropdown = false;
+    }, 100);
+  }
+
+  onOtherBenchmarkTagRemoved(event: any) {
+    // Handle the tag removal if needed
+  }
+}
