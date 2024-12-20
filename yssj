@@ -1,0 +1,92 @@
+<div #parent class="form-group">
+  <label for="txtOB">Other Benchmark/s BBG Code</label>
+  <div class="input-button-form">
+    <tag-input 
+      id="txtOB" 
+      name="txtOB" 
+      [(ngModel)]="publication.otherBenchmark" 
+      (onRemove)="onOtherBenchmarkTagRemoved($event)" 
+      [class]="validation.isvalidOB == false ? 'form-control BBGvalidation' : 'form-control'" 
+      theme="bnptheme" 
+      placeholder="+ Other Benchmark BBG Code" 
+      secondaryPlaceholder="Other Benchmark BBG Code" 
+      [separatorKeyCodes]="[9, 13, 186, 188, 189, 190, 17]" 
+      (inputTextChange)="onInputTextChanged($event)" 
+    >
+    </tag-input>
+    <div class="dropdown" *ngIf="filteredOptions?.length > 0 && showDropdown">
+      <ul class="dropdown-menu">
+        <li 
+          class="dropdown-item" 
+          *ngFor="let option of filteredOptions" 
+          (click)="onSelectOption(option)"
+        >
+          {{ option.bbgCode }} | {{ option.mdsCode }} | {{ option.cinergyCode }}
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+
+
+import { Component } from '@angular/core';
+import { Observable, of } from 'rxjs';
+import { debounceTime, switchMap } from 'rxjs/operators';
+
+export interface AutoCompleteOptions {
+  bbgCode: string;
+  mdsCode: string;
+  cinergyCode: string;
+}
+
+@Component({
+  selector: 'app-edit',
+  templateUrl: './edit.component.html',
+  styleUrls: ['./edit.component.scss']
+})
+export class EditComponent {
+  publication = {
+    otherBenchmark: []
+  };
+  filteredOptions: AutoCompleteOptions[] = [];
+  showDropdown = false;
+
+  private fetchOptions(search: string): Observable<AutoCompleteOptions[]> {
+    const mockData: AutoCompleteOptions[] = [
+      { bbgCode: 'BNPI001', mdsCode: 'MDS001', cinergyCode: 'CIN001' },
+      { bbgCode: 'BNPI002', mdsCode: 'MDS002', cinergyCode: 'CIN002' },
+      { bbgCode: 'BNPI003', mdsCode: 'MDS003', cinergyCode: 'CIN003' },
+    ];
+    return of(mockData.filter(option => option.bbgCode.includes(search)));
+  }
+
+  onInputTextChanged(search: string): void {
+    if (search.length >= 3) {
+      this.showDropdown = true;
+      this.fetchOptions(search)
+        .pipe(debounceTime(300))
+        .subscribe(options => {
+          this.filteredOptions = options;
+        });
+    } else {
+      this.showDropdown = false;
+      this.filteredOptions = [];
+    }
+  }
+
+  onSelectOption(option: AutoCompleteOptions): void {
+    const bbgCode = option.bbgCode;
+    if (!this.publication.otherBenchmark.includes(bbgCode)) {
+      this.publication.otherBenchmark.push(bbgCode);
+    }
+    this.showDropdown = false; // Hide the dropdown after selection
+  }
+
+  onOtherBenchmarkTagRemoved(tag: string): void {
+    const index = this.publication.otherBenchmark.indexOf(tag);
+    if (index > -1) {
+      this.publication.otherBenchmark.splice(index, 1);
+    }
+  }
+}
