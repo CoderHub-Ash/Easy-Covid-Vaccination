@@ -1,0 +1,74 @@
+import { Component, OnInit } from '@angular/core';
+import { FormControl } from '@angular/forms';
+import { Observable, of } from 'rxjs';
+import { debounceTime, switchMap, startWith, map, catchError } from 'rxjs/operators';
+import { PublicationsService } from 'src/app/services/publications.service';
+
+export interface AutoCompleteOptions {
+  bbgCode: string;
+  mdsCode: string;
+  cinergyCode: string;
+}
+
+@Component({
+  selector: 'app-edit',
+  templateUrl: './edit.component.html',
+  styleUrls: ['./edit.component.scss']
+})
+export class EditComponent implements OnInit {
+  publication = {
+    otherBenchmark: []
+  };
+  otherBenchmarkControl = new FormControl();
+  filteredOtherBenchmarkOptions: AutoCompleteOptions[] = [];
+  validation = { isvalidOB: true };
+
+  constructor(private publicationsService: PublicationsService) {}
+
+  ngOnInit() {
+    // Listen to input changes for the dropdown
+    this.otherBenchmarkControl.valueChanges.pipe(
+      startWith(''),
+      debounceTime(300),
+      switchMap(value => 
+        typeof value === 'string' && value.length >= 3 ? this.fetchOptions(value) : of([])
+      )
+    ).subscribe(options => {
+      this.filteredOtherBenchmarkOptions = options;
+    });
+  }
+
+  fetchOptions(value: string): Observable<AutoCompleteOptions[]> {
+    return this.publicationsService.getAutocompleteOptions(value).pipe(
+      map(data =>
+        data.map(item => ({
+          bbgCode: item.bbgCode,
+          mdsCode: item.mdsCode,
+          cinergyCode: item.cinergyCode
+        }))
+      ),
+      catchError(() => of([]))
+    );
+  }
+
+  onInputTextChanged(search: string): void {
+    this.otherBenchmarkControl.setValue(search); // Updates form control value
+  }
+
+  onSelectOption(selectedOption: AutoCompleteOptions): void {
+    const selectedBbgCode = selectedOption.bbgCode;
+
+    // Add the selected bbgCode if it doesn't already exist in the otherBenchmark array
+    if (!this.publication.otherBenchmark.includes(selectedBbgCode)) {
+      this.publication.otherBenchmark.push(selectedBbgCode);
+    }
+  }
+
+  onOtherBenchmarkTagRemoved(tag: string): void {
+    // Remove the tag from the otherBenchmark array
+    const index = this.publication.otherBenchmark.indexOf(tag);
+    if (index > -1) {
+      this.publication.otherBenchmark.splice(index, 1);
+    }
+  }
+}
