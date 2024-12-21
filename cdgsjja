@@ -1,0 +1,21 @@
+<div #parent class="form-group">
+  <label for="txtOB">Other Benchmark/s BBG Code</label>
+  <mat-chip-list aria-label="Other Benchmark/s BBG Code">
+    <mat-chip
+      *ngFor="let benchmark of publication.otherBenchmark"
+      (removed)="onOtherBenchmarkTagRemoved(benchmark)"
+    >
+      {{ benchmark }}
+      <button matChipRemove>
+        <mat-icon>cancel</mat-icon>
+      </button>
+    </mat-chip>
+    <input
+      placeholder="+ Other Benchmark BBG Code"
+      [matChipInputFor]="chipList"
+      [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+      [matChipInputAddOnBlur]="addOnBlur"
+      (matChipInputTokenEnd)="add($event)"
+    />
+  </mat-chip-list>
+</div>
