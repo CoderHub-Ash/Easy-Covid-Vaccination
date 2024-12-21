@@ -32,3 +32,54 @@ export class OtherBenchmarkComponent {
     }
   }
 }
+
+
+
+import { Component } from '@angular/core';
+import { FormControl } from '@angular/forms';
+import { COMMA, ENTER } from '@angular/cdk/keycodes';
+
+@Component({
+  selector: 'app-other-benchmark',
+  templateUrl: './other-benchmark.component.html',
+  styleUrls: ['./other-benchmark.component.css'],
+})
+export class OtherBenchmarkComponent {
+  otherBenchmarkControl = new FormControl('');
+  separatorKeyCodes = [ENTER, COMMA];
+  otherBenchmarkChips: string[] = [];
+  validation = { isvalidOB: true }; // Replace with actual validation logic
+
+  addChip(event: any): void {
+    const value = (event.value || '').trim();
+    if (value) {
+      this.otherBenchmarkChips.push(value);
+    }
+    // Clear the input
+    if (event.input) {
+      event.input.value = '';
+    }
+    this.otherBenchmarkControl.setValue('');
+  }
+
+  removeChip(chip: string): void {
+    const index = this.otherBenchmarkChips.indexOf(chip);
+    if (index >= 0) {
+      this.otherBenchmarkChips.splice(index, 1);
+    }
+  }
+}
+
+
+
+.full-width {
+  width: 100%;
+}
+
+.form-control {
+  padding: 4px;
+}
+
+.BBGvalidation {
+  border-color: red;
+}
