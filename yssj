@@ -72,14 +72,39 @@ export class OtherBenchmarkComponent {
 
 
 
-.full-width {
-  width: 100%;
-}
 
-.form-control {
-  padding: 4px;
-}
+mat-chip-list {
+  height: auto;
 
-.BBGvalidation {
-  border-color: red;
+  .mat-chip-list-wrapper {
+    border-bottom: 2px solid transparent; // Default border
+    transition: border-color 0.2s ease-in-out;
+  }
+
+  &.mat-focused .mat-chip-list-wrapper {
+    border-bottom: 2px solid $bnp-green !important; // Match the focus style
+  }
+
+  input {
+    outline: none;
+    border: none;
+    box-shadow: none;
+    padding: 4px 0;
+    font-size: 14px;
+    width: 100%;
+  }
+
+  mat-chip {
+    margin: 4px;
+    background-color: #e0e0e0;
+    color: #424242;
+
+    .mat-icon {
+      color: #757575;
+    }
+
+    &:hover {
+      background-color: lighten(#e0e0e0, 10%);
+    }
+  }
 }
