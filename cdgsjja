@@ -1,21 +1,57 @@
-<div #parent class="form-group">
-  <label for="txtOB">Other Benchmark/s BBG Code</label>
-  <mat-chip-list aria-label="Other Benchmark/s BBG Code">
-    <mat-chip
-      *ngFor="let benchmark of publication.otherBenchmark"
-      (removed)="onOtherBenchmarkTagRemoved(benchmark)"
-    >
-      {{ benchmark }}
-      <button matChipRemove>
-        <mat-icon>cancel</mat-icon>
-      </button>
-    </mat-chip>
-    <input
-      placeholder="+ Other Benchmark BBG Code"
-      [matChipInputFor]="chipList"
-      [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
-      [matChipInputAddOnBlur]="addOnBlur"
-      (matChipInputTokenEnd)="add($event)"
-    />
-  </mat-chip-list>
-</div>
+<mat-chip-list aria-label="Other Benchmark/s BBG Code">
+  <mat-chip
+    *ngFor="let benchmark of publication.otherBenchmark"
+    (removed)="onOtherBenchmarkTagRemoved(benchmark)"
+  >
+    {{ benchmark }}
+    <button matChipRemove>
+      <mat-icon>cancel</mat-icon>
+    </button>
+  </mat-chip>
+  <input
+    placeholder="+ Other Benchmark BBG Code"
+    [matChipInputFor]="chipList"
+    [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+    [matChipInputAddOnBlur]="addOnBlur"
+    (matChipInputTokenEnd)="add($event)"
+  />
+</mat-chip-list>
+
+
+
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+// ... other imports
+import { MatChipInputEvent } from '@angular/material/chips';
+import { COMMA, ENTER } from '@angular/cdk/keycodes';
+
+@Component({
+  // ... your component metadata
+})
+export class EditComponent implements OnInit {
+  // ... your existing properties
+
+  addOnBlur = true;
+  readonly separatorKeysCodes = [ENTER, COMMA] as const;
+
+  // ... your existing methods
+
+  add(event: MatChipInputEvent): void {
+    const value = (event.value || '').trim();
+
+    if (value) {
+      this.publication.otherBenchmark.push(value);
+
+      // (Optional) Call your service to validate the entered benchmark
+    }
+
+    event.chipInput!.clear();
+  }
+
+  onOtherBenchmarkTagRemoved(benchmark: string): void {
+    const index = this.publication.otherBenchmark.indexOf(benchmark);
+
+    if (index >= 0) {
+      this.publication.otherBenchmark.splice(index, 1);
+    }
+  }
+}
