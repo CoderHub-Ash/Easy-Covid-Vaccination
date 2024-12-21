@@ -188,3 +188,48 @@ mat-chip-list {
     }
   }
 }
+
+
+
+
+.full-width {
+  width: 100%;
+}
+
+.custom-chip-list {
+  mat-form-field {
+    margin: 16px 0;
+    height: auto;
+
+    .mat-chip-list-wrapper {
+      border: 1px solid #d9d9d9; /* Default border */
+      border-radius: 4px;
+      padding: 4px;
+      transition: border-color 0.2s ease-in-out;
+
+      &:focus-within {
+        border: 2px solid #43a047; /* Green border when focused */
+      }
+    }
+
+    input {
+      font-size: 14px;
+      padding: 8px 0;
+    }
+
+    mat-chip {
+      margin: 4px;
+      background-color: #e0f7fa;
+      color: #00796b;
+      font-size: 14px;
+
+      .mat-icon {
+        color: #004d40;
+      }
+
+      &:hover {
+        background-color: lighten(#e0f7fa, 10%);
+      }
+    }
+  }
+}
