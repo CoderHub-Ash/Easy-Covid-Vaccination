@@ -233,3 +233,32 @@ mat-chip-list {
     }
   }
 }
+
+
+
+
+<div class="input-button-form">
+  <mat-form-field class="full-width custom-chip-list" appearance="outline">
+    <mat-label>Other Benchmark/s BBG Code</mat-label>
+    <mat-chip-list #chipList>
+      <!-- Dynamically render chips -->
+      <mat-chip 
+        *ngFor="let chip of otherBenchmarkChips" 
+        [removable]="true" 
+        (removed)="removeChip(chip)">
+        {{ chip }}
+        <mat-icon matChipRemove>cancel</mat-icon>
+      </mat-chip>
+
+      <!-- Input for new chips -->
+      <input
+        placeholder="Other Benchmark/s BBG Code"
+        [formControl]="otherBenchmarkControl"
+        [matChipInputFor]="chipList"
+        [matChipInputSeparatorKeyCodes]="separatorKeyCodes"
+        [matChipInputAddOnBlur]="true"
+        (matChipInputTokenEnd)="addChip($event)"
+      />
+    </mat-chip-list>
+  </mat-form-field>
+</div>
