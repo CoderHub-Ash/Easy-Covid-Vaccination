@@ -1,38 +1,33 @@
-import { Component } from '@angular/core';
-import { FormControl } from '@angular/forms';
-import { COMMA, ENTER } from '@angular/cdk/keycodes';
+<div class="input-button-form">
+  <mat-form-field class="full-width">
+    <mat-chip-list #chipList>
+      <mat-chip 
+        *ngFor="let chip of otherBenchmarkChips" 
+        [removable]="true" 
+        (removed)="removeChip(chip)">
+        {{ chip }}
+        <mat-icon matChipRemove>cancel</mat-icon>
+      </mat-chip>
+      <input
+        id="txtOB"
+        name="txtOB"
+        placeholder="+ Other Benchmark BBG Code"
+        [formControl]="otherBenchmarkControl"
+        [matChipInputFor]="chipList"
+        [matChipInputSeparatorKeyCodes]="separatorKeyCodes"
+        [matChipInputAddOnBlur]="true"
+        (matChipInputTokenEnd)="addChip($event)"
+        [ngClass]="validation.isvalidOB === false ? 'form-control BBGvalidation' : 'form-control'"
+      />
+    </mat-chip-list>
+  </mat-form-field>
 
-@Component({
-  selector: 'app-other-benchmark',
-  templateUrl: './other-benchmark.component.html',
-  styleUrls: ['./other-benchmark.component.css'],
-})
-export class OtherBenchmarkComponent {
-  otherBenchmarkControl = new FormControl('');
-  separatorKeyCodes = [ENTER, COMMA];
-  otherBenchmarkChips: string[] = [];
-  validation = { isvalidOB: true }; // Replace with actual validation logic
-
-  addChip(event: any): void {
-    const value = (event.value || '').trim();
-    if (value) {
-      this.otherBenchmarkChips.push(value);
-    }
-    // Clear the input
-    if (event.input) {
-      event.input.value = '';
-    }
-    this.otherBenchmarkControl.setValue('');
-  }
-
-  removeChip(chip: string): void {
-    const index = this.otherBenchmarkChips.indexOf(chip);
-    if (index >= 0) {
-      this.otherBenchmarkChips.splice(index, 1);
-    }
-  }
-}
-
+  <app-aggregation-index
+    id="app-aggregation-index-otherbenchmark"
+    type="otherBenchmark"
+    [otherBenchmark]="publication.otherBenchmark">
+  </app-aggregation-index>
+</div>
 
 
 import { Component } from '@angular/core';
