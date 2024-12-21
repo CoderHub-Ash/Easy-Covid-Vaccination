@@ -262,3 +262,66 @@ mat-chip-list {
     </mat-chip-list>
   </mat-form-field>
 </div>
+
+
+
+
+::ng-deep .mat-chip-list-wrapper {
+  border: 1px solid #d9d9d9; /* Default border color */
+  border-radius: 4px; /* Rounded corners */
+  padding: 4px; /* Padding inside the chip list */
+  transition: border-color 0.2s ease-in-out; /* Smooth border transition on focus */
+}
+
+::ng-deep .mat-chip-list-wrapper:focus-within {
+  border: 2px solid #43a047; /* Green border when focused */
+}
+
+::ng-deep mat-chip {
+  margin: 4px; /* Space between chips */
+  background-color: #e0f7fa; /* Light cyan background for chips */
+  color: #00796b; /* Text color for chips */
+  font-size: 14px; /* Font size for chip content */
+  border-radius: 16px; /* Rounded chip style */
+
+  .mat-icon {
+    color: #004d40; /* Icon color */
+  }
+
+  &:hover {
+    background-color: lighten(#e0f7fa, 10%); /* Slightly lighter background on hover */
+  }
+}
+
+::ng-deep input {
+  font-size: 14px; /* Match font size with chips */
+  padding: 8px 0; /* Consistent padding */
+  border: none; /* Remove input border */
+  outline: none; /* Remove input focus outline */
+}
+
+::ng-deep .mat-chip {
+  display: flex;
+  align-items: center; /* Align text and icon vertically */
+}
+
+::ng-deep .mat-chip-remove {
+  cursor: pointer; /* Change cursor to pointer for remove icon */
+}
+
+::ng-deep .mat-form-field {
+  width: 100%; /* Make the field take full width */
+  margin: 16px 0; /* Add vertical spacing */
+}
+
+::ng-deep .mat-form-field-appearance-outline .mat-form-field-outline {
+  border-color: #d9d9d9; /* Default border color for outline */
+}
+
+::ng-deep .mat-form-field-appearance-outline.mat-focused .mat-form-field-outline {
+  border-color: #43a047; /* Green border when focused */
+}
+
+::ng-deep .mat-form-field-appearance-outline .mat-form-field-outline-thick {
+  border-width: 2px; /* Thicker border for focused state */
+}
