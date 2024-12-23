@@ -359,3 +359,61 @@ mat-chip-list {
     </mat-autocomplete>
   </mat-form-field>
 </div>
+
+
+
+import { Component } from '@angular/core';
+import { FormControl } from '@angular/forms';
+import { Observable, of } from 'rxjs';
+import { debounceTime, switchMap, startWith, catchError, map } from 'rxjs/operators';
+
+@Component({
+  selector: 'app-your-component',
+  templateUrl: './your-component.component.html',
+  styleUrls: ['./your-component.component.css']
+})
+export class YourComponent {
+  otherBenchmarkControl = new FormControl();
+  otherBenchmarkChips: string[] = [];
+  separatorKeyCodes: number[] = [13, 188]; // Enter and comma key codes
+  filteredOtherBenchmarkOptions: Observable<AutoCompleteOptions[]>;
+
+  constructor(private publicationsService: PublicationsService) {
+    this.filteredOtherBenchmarkOptions = this.otherBenchmarkControl.valueChanges.pipe(
+      startWith(''),
+      debounceTime(300), 
+      switchMap(value => value && value.length >= 3 ? this.fetchOptions(value) : of([])) 
+    );
+  }
+
+  fetchOptions(value: string): Observable<AutoCompleteOptions[]> {
+    return this.publicationsService.getAutocompleteOptions(value).pipe(
+      map(data => data.map(item => ({
+        bbgCode: item.bbgCode,
+        mdsCode: item.mdsCode,
+        cinergyCode: item.cinergyCode
+      }))),
+      catchError(() => of([]))
+    );
+  }
+
+  addChip(option: AutoCompleteOptions): void {
+    if (!this.otherBenchmarkChips.includes(option.bbgCode)) {
+      this.otherBenchmarkChips.push(option.bbgCode); // Only add bbgCode
+    }
+    this.otherBenchmarkControl.setValue(''); // Clear the input after selection
+  }
+
+  removeChip(chip: string): void {
+    const index = this.otherBenchmarkChips.indexOf(chip);
+    if (index >= 0) {
+      this.otherBenchmarkChips.splice(index, 1);
+    }
+  }
+}
+
+interface AutoCompleteOptions {
+  bbgCode: string;
+  mdsCode?: string;
+  cinergyCode?: string;
+}
