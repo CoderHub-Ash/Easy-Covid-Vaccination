@@ -144,4 +144,41 @@ ngOnInit(): void {
 
 
 
+// ... other imports
+import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete'; // Import this
+
+// ... your component code
+
+onSelect(value: string, index: number) { 
+  this.aggregationIndex.aggregationFormula[index].ticker = value;
+}
+
+onInput(value: string, index: number) {
+  this.tickerControl.setValue(value); // Update the control value
+}
+
+
+
+
+
+
+<input 
+  class="form-control col-8"
+  placeholder="BBG Code"
+  id="ticker-{{ this.type }}-{{ i }}"
+  name="ticker"
+  [(ngModel)]="this.aggregationIndex.aggregationFormula[i].ticker"
+  [formControl]="tickerControl" 
+  [matAutocomplete]="auto"
+  (input)="onInput($event.target.value, i)"  <-- Add this
+  required
+>
+<mat-autocomplete #auto="matAutocomplete" (optionSelected)="onSelect($event.option.value, i)">  <-- Add this
+  <mat-option *ngFor="let option of filteredTickers | async" [value]="option.bbgCode">
+    <span class="bbg-code">{{ option.bbgCode }}</span> -
+    <span class="mds-code">{{ option.mdsCode }}</span> -
+    <span class="cinergy-code">{{ option.cinergyCode }}</span>
+  </mat-option>
+</mat-autocomplete>
+
 
