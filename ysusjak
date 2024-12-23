@@ -110,3 +110,21 @@ fetchOptions(value: string): Observable<AutoCompleteOptions[]> {
   );
 }
 
+
+
+
+
+
+ngOnInit(): void {
+  // ... your existing code ...
+
+  this.filteredTickers = this.tickerControl.valueChanges.pipe(
+    startWith(''),
+    map(value => typeof value === 'string' ? value : value.bbgCode), // Adjust if needed
+    // The line below needs to be changed:
+    // map(value => this.fetchOptions(value)) 
+    switchMap(value => this.fetchOptions(value)) // Use switchMap instead of map
+  );
+}
+
+
