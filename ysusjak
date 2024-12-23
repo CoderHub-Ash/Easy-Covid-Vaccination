@@ -70,5 +70,33 @@ onSelect(selectedOption: string, index: number): void {
 
 
 
+ngOnInit(): void {
+  this.aggregationIndex = this.newAggregationIndex();
+  this.selectedAggrPos = -1;
+
+  this.filteredTickers = this.tickerControl.valueChanges.pipe(
+    startWith(''),
+    map(value => typeof value === 'string' ? value : value.bbgCode), // Adjust if needed
+    map(value => this.fetchOptions(value))
+  );
+}
+
+
+
+
+
+
+fetchOptions(value: string): Observable<AutoCompleteOptions[]> {
+  return this.publicationsService.getAutocompleteOptions(value).pipe( // Assuming this method exists
+    map(data => data.map(item => ({
+      bbgCode: item.bbgCode, // Adjust properties as per your AutoCompleteOptions model
+      // ... other properties
+    }))),
+    catchError(() => of([])) 
+  );
+}
+
+
+
 
 
