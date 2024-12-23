@@ -99,4 +99,14 @@ fetchOptions(value: string): Observable<AutoCompleteOptions[]> {
 
 
 
+fetchOptions(value: string): Observable<AutoCompleteOptions[]> {
+  return this.publicationsService.getAutocompleteOptions(value).pipe(
+    map(data => data.map(item => ({
+      bbgCode: item.bbgCode,
+      mdsCode: item.mdsCode, 
+      cinergyCode: item.cinergyCode 
+    }))),
+    catchError(() => of([])) 
+  );
+}
 
