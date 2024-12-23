@@ -417,3 +417,23 @@ interface AutoCompleteOptions {
   mdsCode?: string;
   cinergyCode?: string;
 }
+
+
+addChip(event: any): void {
+  const value = (event.value || '').trim(); // The raw input value
+  const selectedValue = event; // The dropdown selected value
+
+  // If the selected value exists (from dropdown), add it as a chip
+  if (typeof selectedValue === 'object' && selectedValue.bbgCode) {
+    this.otherBenchmarkChips.push(selectedValue.bbgCode);
+  } else if (value) {
+    // If the user presses enter with raw text (optional, if needed)
+    this.otherBenchmarkChips.push(value);
+  }
+
+  // Clear the input
+  if (event.input) {
+    event.input.value = '';
+  }
+  this.otherBenchmarkControl.setValue('');
+}
