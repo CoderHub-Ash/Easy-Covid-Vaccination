@@ -1,0 +1,74 @@
+<ng-container *ngFor="let formula of this.aggregationIndex.aggregationFormula; let i = index">
+  <label for="ticker-{{ this.type }}-{{ i }}">Ticker {{ i + 1 }}</label>
+  <div class="tickerPercentageForm row">
+    <input 
+      class="form-control col-8"
+      placeholder="BBG Code"
+      id="ticker-{{ this.type }}-{{ i }}"
+      name="ticker"
+      [(ngModel)]="this.aggregationIndex.aggregationFormula[i].ticker"
+      [matAutocomplete]="auto-{{ i }}"
+      (input)="onInput($event.target.value, i)" <!-- Trigger filtering -->
+      required
+    >
+    <mat-autocomplete #auto-{{ i }}="matAutocomplete" (optionSelected)="onSelect($event.option.value, i)">
+      <mat-option *ngFor="let option of filteredOptions[i]" [value]="option.bbgCode">
+        {{ option.bbgCode }}
+      </mat-option>
+    </mat-autocomplete>
+
+    <input 
+      class="form-control col-2"
+      placeholder="1-99"
+      id="tickerPercentage-{{ this.type }}-{{ i }}"
+      name="tickerPercentage"
+      type="number"
+      min="1"
+      max="99"
+      [(ngModel)]="this.aggregationIndex.aggregationFormula[i].percentage"
+      required
+    >
+    <i class="fa fa-percentage col"></i>
+    <i 
+      id="removeTicker-{{ this.type }}-{{ i }}" 
+      *ngIf="i >= 2 || i == 3" 
+      class="fa fa-minus clickable col" 
+      (click)="removeTicker(i)"
+    ></i>
+  </div>
+  <i 
+    id="addTicker-{{ this.type }}-{{ i }}"
+    *ngIf="
+      (this.aggregationIndex.aggregationFormula.length < MAX_AMOUNT_TICKERS - 1 && i == 2) || 
+      (this.aggregationIndex.aggregationFormula.length < MAX_AMOUNT_TICKERS - 2 && i == 1)
+    "
+    class="fa fa-plus clickable"
+    (click)="addTicker()"
+  ></i>
+</ng-container>
+
+
+
+
+
+onInput(value: string, index: number): void {
+  if (value.length >= 3) { // Fetch options only if input length is >= 3
+    this.fetchOptions(value).subscribe((options) => {
+      this.filteredOptions[index] = options; // Store filtered options for the current field
+    });
+  } else {
+    this.filteredOptions[index] = []; // Clear suggestions for input less than 3 characters
+  }
+}
+
+
+
+
+onSelect(selectedOption: string, index: number): void {
+  this.aggregationIndex.aggregationFormula[index].ticker = selectedOption;
+}
+
+
+
+
+
