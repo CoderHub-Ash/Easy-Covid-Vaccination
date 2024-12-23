@@ -128,3 +128,20 @@ ngOnInit(): void {
 }
 
 
+
+
+
+
+
+
+<mat-autocomplete #auto="matAutocomplete">
+  <mat-option *ngFor="let option of filteredTickers | async" [value]="option.bbgCode"> 
+    <span class="bbg-code">{{ option.bbgCode }}</span> 
+    (<span class="mds-code">{{ option.mdsCode }}</span>, 
+    <span class="cinergy-code">{{ option.cinergyCode }}</span>)
+  </mat-option>
+</mat-autocomplete>
+
+
+
+
