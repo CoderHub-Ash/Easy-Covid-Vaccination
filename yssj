@@ -325,3 +325,37 @@ mat-chip-list {
 ::ng-deep .mat-form-field-appearance-outline .mat-form-field-outline-thick {
   border-width: 2px; /* Thicker border for focused state */
 }
+
+
+<div class="input-button-form">
+  <mat-form-field class="full-width custom-chip-list" appearance="outline">
+    <mat-label>Other Benchmark/s BBG Code</mat-label>
+    <mat-chip-list #chipList>
+      <!-- Render chips -->
+      <mat-chip 
+        *ngFor="let chip of otherBenchmarkChips" 
+        [removable]="true" 
+        (removed)="removeChip(chip)">
+        {{ chip }} <!-- Show only bbgCode -->
+        <mat-icon matChipRemove>cancel</mat-icon>
+      </mat-chip>
+
+      <!-- Input for autocomplete -->
+      <input
+        placeholder="Other Benchmark/s BBG Code"
+        [formControl]="otherBenchmarkControl"
+        [matChipInputFor]="chipList"
+        [matChipInputSeparatorKeyCodes]="separatorKeyCodes"
+        [matChipInputAddOnBlur]="true"
+        [matAutocomplete]="auto" <!-- Link to autocomplete -->
+      />
+    </mat-chip-list>
+
+    <!-- Autocomplete dropdown -->
+    <mat-autocomplete #auto="matAutocomplete" (optionSelected)="addChip($event.option.value)">
+      <mat-option *ngFor="let option of filteredOtherBenchmarkOptions | async" [value]="option">
+        {{ option.bbgCode }} <!-- Show only bbgCode in dropdown -->
+      </mat-option>
+    </mat-autocomplete>
+  </mat-form-field>
+</div>
