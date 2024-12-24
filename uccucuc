@@ -109,3 +109,67 @@ this.hasUnfilledTickers = this.aggregationIndex.aggregationFormula.some(
     (click)="removeTicker(i)"
   ></i>
 </div>
+
+
+
+
+[HttpPost]
+[Route("validateaggregationindex")]
+public async Task<IActionResult> ValidateAggregationIndex(AggregationIndexModel aggregationIndex)
+{
+    var callerIp = _httpContextAccessor.HttpContext.Connection.RemoteIpAddress.ToString();
+    var currentMethod = MethodBase.GetCurrentMethod().Name;
+
+    // Check QIS
+    var tickers = aggregationIndex.aggregationFormula.Select(a => a.ticker);
+    var validatedTickers = new List<ProductCharacteristicsDTO>();
+    var tickerToValidate = tickers.ToList();
+
+    if (validatedTickers.Count != tickers.Count())
+    {
+        // Validate tickers and fetch data
+        var codeCurrencyMappingList = serviceAggregator.QuotationGenericService.GetCodeCurrencyMapping(tickerToValidate).ToList();
+        ValidateBenchmarksOnQuotationDB(tickerToValidate, codeCurrencyMappingList, validatedTickers);
+
+        if (validatedTickers.Count != tickers.Count())
+        {
+            string errorMessage = string.Join(",", tickerToValidate.Select(t => $"'{t}'")) + ": Ticker(s) not available on MCEStudioDB/QuotationDB";
+            _applicationLogger.Log(LogTypeEnums.ERROR.ToString(), currentMethod, errorMessage, null, callerIp);
+            return BadRequest(errorMessage);
+        }
+    }
+
+    // Generate Aggregation Codes
+    aggregationIndex.aggregationTicker = "AGGR";
+    aggregationIndex.aggregationMdsCode = "AGGR_MDS";
+    aggregationIndex.aggregationCinergyCode = "AGGR_CIN";
+
+    aggregationIndex.aggregationFormula
+        .OrderBy(a => a.ticker)
+        .ToList()
+        .ForEach(element =>
+        {
+            // Generate aggregationTicker
+            var tickerCode = element.ticker?.Split(" ")[0] ?? "NULL";
+            var tickerCodeSlice = tickerCode.Length > 4 ? tickerCode.Substring(tickerCode.Length - 4) : tickerCode;
+            aggregationIndex.aggregationTicker += $"{tickerCodeSlice}{element.percentage}_";
+
+            // Generate aggregationMdsCode
+            var mdsCode = element.mdsCode ?? "NULL";
+            var mdsCodeSlice = mdsCode.Length > 4 ? mdsCode.Substring(mdsCode.Length - 4) : mdsCode;
+            aggregationIndex.aggregationMdsCode += $"{mdsCodeSlice}{element.percentage}_";
+
+            // Generate aggregationCinergyCode
+            var cinergyCode = element.cinergyCode ?? "NULL";
+            var cinergyCodeSlice = cinergyCode.Length > 4 ? cinergyCode.Substring(cinergyCode.Length - 4) : cinergyCode;
+            aggregationIndex.aggregationCinergyCode += $"{cinergyCodeSlice}{element.percentage}_";
+        });
+
+    // Trim trailing underscores and convert to uppercase
+    aggregationIndex.aggregationTicker = aggregationIndex.aggregationTicker.TrimEnd('_').ToUpper();
+    aggregationIndex.aggregationMdsCode = aggregationIndex.aggregationMdsCode.TrimEnd('_').ToUpper();
+    aggregationIndex.aggregationCinergyCode = aggregationIndex.aggregationCinergyCode.TrimEnd('_').ToUpper();
+
+    return Ok(aggregationIndex);
+}
+
