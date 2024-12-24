@@ -228,3 +228,35 @@ validate() {
     }
   });
 }
+
+
+
+
+
+validate() {
+  this.isLoading = true;
+  this.publicationsService.validateAggregationIndex(this.aggregationIndex).subscribe({
+    next: (response) => {
+      this.aggregationIndex = response;
+
+      if (this.isCoreBenchmarkBtn) {
+        this.selectedCoreBenchmark = {
+          bbgCode: this.aggregationIndex.aggregationTicker,
+          mdsCode: this.aggregationIndex.aggregationMdsCode,
+          cinergyCode: this.aggregationIndex.aggregationCinergyCode,
+        };
+        this.coreBenchmarkControl.setValue(this.selectedCoreBenchmark.bbgCode);
+        this.coreBenchmarkChange.emit(this.selectedCoreBenchmark.bbgCode);
+      }
+    },
+    error: (error) => {
+      console.error(error);
+    },
+    complete: () => {
+      this.isLoading = false;
+    },
+  });
+}
+
+
+
