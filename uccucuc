@@ -173,3 +173,58 @@ public async Task<IActionResult> ValidateAggregationIndex(AggregationIndexModel 
     return Ok(aggregationIndex);
 }
 
+
+validate() {
+  this.hasDuplicateTickers = false;
+  this.hasInvalidPercentages = false;
+  this.hasInvalidTickers.isInvalid = false;
+  this.hasUnfilledTickers = false;
+
+  // Existing validation logic...
+
+  this.isLoading = true;
+  this.publicationsService.validateAggregationIndex(this.aggregationIndex).subscribe({
+    next: (response) => {
+      // Update the aggregationIndex with the response
+      this.aggregationIndex = response;
+
+      if (this.isCoreBenchmarkBtn) {
+        // Update Core Benchmark
+        this.coreBenchmark = this.aggregationIndex.aggregationTicker;
+        this.coreBenchmarkChange.emit(this.coreBenchmark); // Emit the updated value
+        this.isCoreBenchmarkFieldDisabled.emit(true);
+
+        // Update the AggregationIndexList
+        const coreIndex = this.aggregationIndexList.findIndex(a => a.isCoreBenchmark);
+        if (coreIndex !== -1) {
+          this.aggregationIndexList[coreIndex] = this.aggregationIndex;
+        } else {
+          this.aggregationIndexList.push(this.aggregationIndex);
+        }
+      } else {
+        // Update Other Benchmarks
+        const aggregationTicker = this.aggregationIndex.aggregationTicker;
+        if (!this.otherBenchmark.some(b => b.value === aggregationTicker)) {
+          this.otherBenchmark.push({
+            display: aggregationTicker,
+            value: aggregationTicker
+          });
+        }
+        this.otherBenchmarkChange.emit(this.otherBenchmark); // Emit the updated values
+      }
+
+      this.aggregationIndexListChange.emit(this.aggregationIndexList);
+      this.hasInvalidTickers.isInvalid = false;
+      this.hasInvalidTickers.errorMsg = '';
+    },
+    error: (error) => {
+      this.hasInvalidTickers.isInvalid = true;
+      this.hasInvalidTickers.errorMsg = error.error;
+    },
+    complete: () => {
+      this.isLoading = false;
+      this.cdr.detectChanges();
+      this.modalService.close('mdlAggregationIndexForm-' + this.type);
+    }
+  });
+}
