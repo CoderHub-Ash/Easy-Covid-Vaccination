@@ -1,0 +1,111 @@
+onInput(value: string, index: number) {
+  if (value && value.length >= 3) {
+    this.publicationsService.getAutocompleteOptions(value).subscribe({
+      next: (options) => {
+        this.filteredOptions[index] = options.map((item) => ({
+          bbgCode: item.bbgCode,
+          mdsCode: item.mdsCode,
+          cinergyCode: item.cinergyCode,
+          displayName: `${item.bbgCode} (${item.mdsCode}, ${item.cinergyCode})`
+        }));
+      },
+      error: () => {
+        this.filteredOptions[index] = [];
+      }
+    });
+  } else {
+    this.filteredOptions[index] = [];
+  }
+}
+
+
+onSelect(option: any, index: number): void {
+  this.aggregationIndex.aggregationFormula[index].ticker = option.bbgCode;
+  this.aggregationIndex.aggregationFormula[index].mdsCode = option.mdsCode;
+  this.aggregationIndex.aggregationFormula[index].cinergyCode = option.cinergyCode;
+}
+
+addTicker() {
+  const emptyFormula: AggregationFormula = { ticker: null, mdsCode: null, cinergyCode: null, percentage: null };
+  this.aggregationIndex.aggregationFormula.push(emptyFormula);
+
+  // Initialize filteredOptions for the new ticker
+  this.filteredOptions[this.aggregationIndex.aggregationFormula.length - 1] = [];
+}
+
+this.hasUnfilledTickers = this.aggregationIndex.aggregationFormula.some(
+  (formula) =>
+    !formula.ticker || formula.ticker.trim() === '' ||
+    !formula.mdsCode || formula.mdsCode.trim() === '' ||
+    !formula.cinergyCode || formula.cinergyCode.trim() === ''
+);
+
+
+
+
+
+
+<div class="tickerPercentageForm row align-items-center">
+  <!-- BBG Code Input with Autocomplete -->
+  <input
+    class="form-control col-4"
+    placeholder="BBG Code"
+    id="ticker-{{ this.type }}-{{ i }}"
+    name="ticker"
+    [(ngModel)]="this.aggregationIndex.aggregationFormula[i].ticker"
+    [matAutocomplete]="auto-{{ i }}"
+    (input)="onInput($event.target.value, i)"
+    required
+  />
+  <mat-autocomplete #auto-{{ i }}="matAutocomplete" (optionSelected)="onSelect($event.option.value, i)">
+    <mat-option *ngFor="let option of filteredOptions[i]" [value]="option">
+      {{ option.displayName }}
+    </mat-option>
+  </mat-autocomplete>
+
+  <!-- MDS Code -->
+  <input
+    class="form-control col-3"
+    placeholder="MDS Code"
+    id="mdsCode-{{ this.type }}-{{ i }}"
+    name="mdsCode"
+    [(ngModel)]="this.aggregationIndex.aggregationFormula[i].mdsCode"
+    readonly
+    required
+  />
+
+  <!-- Cinergy Code -->
+  <input
+    class="form-control col-3"
+    placeholder="Cinergy Code"
+    id="cinergyCode-{{ this.type }}-{{ i }}"
+    name="cinergyCode"
+    [(ngModel)]="this.aggregationIndex.aggregationFormula[i].cinergyCode"
+    readonly
+    required
+  />
+
+  <!-- Percentage Input -->
+  <input
+    class="form-control col-2 mx-1"
+    placeholder="1-99"
+    id="tickerPercentage-{{ this.type }}-{{ i }}"
+    name="tickerPercentage"
+    type="number"
+    min="1"
+    max="99"
+    [(ngModel)]="this.aggregationIndex.aggregationFormula[i].percentage"
+    required
+  />
+
+  <!-- Percentage Icon -->
+  <i class="fa fa-percentage col-auto"></i>
+
+  <!-- Remove Ticker Icon -->
+  <i
+    id="removeTicker-{{ this.type }}-{{ i }}"
+    *ngIf="i >= 2 || i == 3"
+    class="fa fa-minus clickable col-auto mx-1"
+    (click)="removeTicker(i)"
+  ></i>
+</div>
