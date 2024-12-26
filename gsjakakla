@@ -1,0 +1,25 @@
+addChip(event: any): void {
+  const selectedValue = event; // The dropdown selected value
+
+  // If the selected value exists (from dropdown), add it as a chip
+  if (typeof selectedValue === 'object' && selectedValue.bbgCode) {
+    // Check for duplicates in the selectedOtherBenchmarks list
+    const isDuplicate = this.selectedOtherBenchmarks.some(
+      (benchmark) => benchmark.bbgCode === selectedValue.bbgCode
+    );
+
+    if (!isDuplicate) {
+      this.otherBenchmarkChips.push(selectedValue.bbgCode); // Add to chips
+      this.selectedOtherBenchmarks.push(selectedValue);    // Add to the selected list
+    } else {
+      console.warn(`Duplicate entry: ${selectedValue.bbgCode}`);
+      // Optionally, show a notification or alert to the user
+    }
+  }
+
+  // Clear the input
+  if (event.input) {
+    event.input.value = '';
+  }
+  this.otherBenchmarkControl.setValue(''); 
+}
