@@ -1,51 +1,91 @@
-def allocate_table_width(table, original_table_width, min_column_width):
-    # Step 1: Calculate longest text width for each column
-    column_widths = []
-    for column in table.columns:
-        max_text_length = max([len(cell.text) for cell in column])
-        column_widths.append(max_text_length)
+public void AllocateTableWidth(ITable table, float originalTableWidth, float minColumnWidth)
+{
+    int columnCount = table.Columns.Count;
+    float[] columnWidths = new float[columnCount];
 
-    # Step 2: Calculate new table width based on column widths
-    new_table_width = sum(column_widths)
+    // Step 1: Calculate the longest text width for each column
+    for (int col = 0; col < columnCount; col++)
+    {
+        float maxTextWidth = 0;
+        foreach (IRow row in table.Rows)
+        {
+            ICell cell = row[col];
+            float textWidth = GetTextWidth(cell.TextFrame.Text);
+            maxTextWidth = Math.Max(maxTextWidth, textWidth);
+        }
+        columnWidths[col] = maxTextWidth;
+    }
 
-    # Step 3: Compare new width with the original table width
-    width_difference = new_table_width - original_table_width
+    // Step 2: Calculate new table width based on column widths
+    float newTableWidth = columnWidths.Sum();
 
-    if width_difference > 0:
-        # Step 4: Reduce the difference equally in columns (excluding the first column)
-        for i in range(1, len(column_widths)):
-            reduction = min(width_difference / (len(column_widths) - 1), column_widths[i] - min_column_width)
-            column_widths[i] -= reduction
-            width_difference -= reduction
-            if width_difference <= 0:
-                break
-    elif width_difference < 0:
-        # Step 5: Add the difference equally to all columns
-        increment = abs(width_difference) / len(column_widths)
-        for i in range(len(column_widths)):
-            column_widths[i] += increment
+    // Step 3: Compare new width with the original table width
+    float widthDifference = newTableWidth - originalTableWidth;
 
-    # Step 6: Ensure no column is below the minimum width
-    for i in range(len(column_widths)):
-        if column_widths[i] < min_column_width:
-            excess = min_column_width - column_widths[i]
-            column_widths[i] = min_column_width
-            # Adjust other columns to maintain overall width
-            adjust_excess(column_widths, i, excess)
+    if (widthDifference > 0)
+    {
+        // Step 4: Reduce the difference equally across columns (except the first column)
+        for (int col = 1; col < columnCount; col++)
+        {
+            float reduction = Math.Min(widthDifference / (columnCount - 1), columnWidths[col] - minColumnWidth);
+            columnWidths[col] -= reduction;
+            widthDifference -= reduction;
 
-    # Step 7: Apply the final column widths to the table
-    apply_widths_to_table(table, column_widths)
+            if (widthDifference <= 0)
+                break;
+        }
+    }
+    else if (widthDifference < 0)
+    {
+        // Step 5: Add the difference equally to all columns
+        float increment = Math.Abs(widthDifference) / columnCount;
+        for (int col = 0; col < columnCount; col++)
+        {
+            columnWidths[col] += increment;
+        }
+    }
 
+    // Step 6: Ensure no column width is below the minimum width
+    for (int col = 0; col < columnCount; col++)
+    {
+        if (columnWidths[col] < minColumnWidth)
+        {
+            float excess = minColumnWidth - columnWidths[col];
+            columnWidths[col] = minColumnWidth;
 
-def adjust_excess(column_widths, fixed_index, excess):
-    # Distribute excess reduction across other columns
-    other_indices = [i for i in range(len(column_widths)) if i != fixed_index]
-    reduction = excess / len(other_indices)
-    for i in other_indices:
-        column_widths[i] = max(column_widths[i] - reduction, min_column_width)
+            // Adjust the excess reduction across other columns
+            AdjustExcess(columnWidths, col, excess, minColumnWidth);
+        }
+    }
 
+    // Step 7: Apply the calculated column widths to the table
+    ApplyWidthsToTable(table, columnWidths);
+}
 
-def apply_widths_to_table(table, column_widths):
-    # Apply the calculated widths to the table
-    for i, column in enumerate(table.columns):
-        column.width = column_widths[i]
+private void AdjustExcess(float[] columnWidths, int fixedIndex, float excess, float minColumnWidth)
+{
+    int columnCount = columnWidths.Length;
+    float reduction = excess / (columnCount - 1);
+
+    for (int col = 0; col < columnCount; col++)
+    {
+        if (col == fixedIndex) continue;
+
+        columnWidths[col] = Math.Max(columnWidths[col] - reduction, minColumnWidth);
+    }
+}
+
+private void ApplyWidthsToTable(ITable table, float[] columnWidths)
+{
+    for (int col = 0; col < table.Columns.Count; col++)
+    {
+        table.Columns[col].Width = columnWidths[col];
+    }
+}
+
+private float GetTextWidth(string text)
+{
+    // Mock implementation to calculate text width
+    // Replace this with actual text width calculation based on font size and style
+    return text.Length * 7; // Assuming each character takes ~7 units
+}
