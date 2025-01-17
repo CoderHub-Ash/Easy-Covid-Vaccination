@@ -1,0 +1,117 @@
+public void AllocateTableWidth(ITable table, float originalTableWidth, float minColumnWidth)
+{
+    int columnCount = table.Columns.Count;
+    float[] columnWidths = new float[columnCount];
+
+    // Step 1: Calculate the longest text width for each column
+    for (int col = 0; col < columnCount; col++)
+    {
+        float maxTextWidth = 0;
+        foreach (IRow row in table.Rows)
+        {
+            ICell cell = row[col];
+            float textWidth = GetTextWidth(cell.TextFrame.Text);
+            maxTextWidth = Math.Max(maxTextWidth, textWidth);
+        }
+        columnWidths[col] = maxTextWidth;
+    }
+
+    // Step 2: Calculate new table width based on column widths
+    float newTableWidth = columnWidths.Sum();
+
+    // Step 3: Compare new width with the original table width
+    float widthDifference = newTableWidth - originalTableWidth;
+
+    if (widthDifference > 0)
+    {
+        // Step 4: Reduce the difference excluding the first column and columns with minimum width
+        ReduceExcessWidth(columnWidths, widthDifference, minColumnWidth);
+    }
+    else if (widthDifference < 0)
+    {
+        // Step 5: Add the difference equally to all columns
+        float increment = Math.Abs(widthDifference) / columnCount;
+        for (int col = 0; col < columnCount; col++)
+        {
+            columnWidths[col] += increment;
+        }
+    }
+
+    // Step 6: Apply the calculated column widths to the table
+    ApplyWidthsToTable(table, columnWidths);
+
+    // Final Validation: Ensure final width matches the original
+    float finalTableWidth = columnWidths.Sum();
+    if (Math.Abs(finalTableWidth - originalTableWidth) > 0.01f)
+    {
+        Console.WriteLine("Warning: Final table width exceeds original table width.");
+    }
+}
+
+private void ReduceExcessWidth(float[] columnWidths, float excess, float minColumnWidth)
+{
+    int columnCount = columnWidths.Length;
+
+    while (excess > 0)
+    {
+        // Get the list of adjustable columns (excluding the first and those at minimum width)
+        var adjustableColumns = columnWidths
+            .Select((width, index) => new { Index = index, Width = width })
+            .Where(col => col.Index != 0 && col.Width > minColumnWidth)
+            .ToList();
+
+        if (adjustableColumns.Count > 0)
+        {
+            // Distribute the excess among adjustable columns
+            float reduction = excess / adjustableColumns.Count;
+
+            foreach (var col in adjustableColumns)
+            {
+                float maxReduction = col.Width - minColumnWidth;
+                float actualReduction = Math.Min(reduction, maxReduction);
+                columnWidths[col.Index] -= actualReduction;
+                excess -= actualReduction;
+
+                if (excess <= 0)
+                    break;
+            }
+        }
+        else
+        {
+            // If all columns (except the first) are at minimum width, distribute the excess across all columns
+            float reduction = excess / columnCount;
+
+            for (int col = 0; col < columnCount; col++)
+            {
+                float maxReduction = columnWidths[col] - minColumnWidth;
+                float actualReduction = Math.Min(reduction, maxReduction);
+                columnWidths[col] -= actualReduction;
+                excess -= actualReduction;
+
+                if (excess <= 0)
+                    break;
+            }
+        }
+
+        // Break if no further adjustments are possible
+        if (adjustableColumns.Count == 0)
+        {
+            break;
+        }
+    }
+}
+
+private void ApplyWidthsToTable(ITable table, float[] columnWidths)
+{
+    for (int col = 0; col < table.Columns.Count; col++)
+    {
+        table.Columns[col].Width = columnWidths[col];
+    }
+}
+
+private float GetTextWidth(string text)
+{
+    // Mock implementation to calculate text width
+    // Replace this with actual text width calculation based on font size and style
+    return text.Length * 7; // Assuming each character takes ~7 units
+}
