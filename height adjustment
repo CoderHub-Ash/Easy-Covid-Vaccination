@@ -89,3 +89,135 @@ private float GetTextWidth(string text)
     // Replace this with actual text width calculation based on font size and style
     return text.Length * 7; // Assuming each character takes ~7 units
 }
+
+
+
+
+
+
+private void AdjustExcess(float[] columnWidths, int fixedIndex, float excess, float minColumnWidth)
+{
+    int columnCount = columnWidths.Length;
+    float remainingExcess = excess;
+
+    // Distribute excess reduction across other columns
+    while (remainingExcess > 0)
+    {
+        bool adjustmentMade = false;
+        float reduction = remainingExcess / (columnCount - 1);
+
+        for (int col = 0; col < columnCount; col++)
+        {
+            if (col == fixedIndex) continue;
+
+            // Determine how much this column can be reduced
+            float maxReduction = columnWidths[col] - minColumnWidth;
+
+            if (maxReduction > 0)
+            {
+                float actualReduction = Math.Min(reduction, maxReduction);
+                columnWidths[col] -= actualReduction;
+                remainingExcess -= actualReduction;
+                adjustmentMade = true;
+
+                if (remainingExcess <= 0)
+                    break;
+            }
+        }
+
+        // If no columns could be adjusted, break to avoid infinite loop
+        if (!adjustmentMade)
+        {
+            break;
+        }
+    }
+}
+
+
+
+
+public void AllocateTableWidth(ITable table, float originalTableWidth, float minColumnWidth)
+{
+    int columnCount = table.Columns.Count;
+    float[] columnWidths = new float[columnCount];
+
+    // Step 1: Calculate the longest text width for each column
+    for (int col = 0; col < columnCount; col++)
+    {
+        float maxTextWidth = 0;
+        foreach (IRow row in table.Rows)
+        {
+            ICell cell = row[col];
+            float textWidth = GetTextWidth(cell.TextFrame.Text);
+            maxTextWidth = Math.Max(maxTextWidth, textWidth);
+        }
+        columnWidths[col] = maxTextWidth;
+    }
+
+    // Step 2: Calculate new table width based on column widths
+    float newTableWidth = columnWidths.Sum();
+
+    // Step 3: Compare new width with the original table width
+    float widthDifference = newTableWidth - originalTableWidth;
+
+    if (widthDifference > 0)
+    {
+        // Step 4: Reduce the difference equally across columns (except the first column)
+        for (int col = 1; col < columnCount; col++)
+        {
+            float reduction = Math.Min(widthDifference / (columnCount - 1), columnWidths[col] - minColumnWidth);
+            columnWidths[col] -= reduction;
+            widthDifference -= reduction;
+
+            if (widthDifference <= 0)
+                break;
+        }
+    }
+    else if (widthDifference < 0)
+    {
+        // Step 5: Add the difference equally to all columns
+        float increment = Math.Abs(widthDifference) / columnCount;
+        for (int col = 0; col < columnCount; col++)
+        {
+            columnWidths[col] += increment;
+        }
+    }
+
+    // Step 6: Ensure no column width is below the minimum width
+    for (int col = 0; col < columnCount; col++)
+    {
+        if (columnWidths[col] < minColumnWidth)
+        {
+            float excess = minColumnWidth - columnWidths[col];
+            columnWidths[col] = minColumnWidth;
+
+            // Adjust the excess reduction across other columns
+            AdjustExcess(columnWidths, col, excess, minColumnWidth);
+        }
+    }
+
+    // Step 7: Apply the calculated column widths to the table
+    ApplyWidthsToTable(table, columnWidths);
+
+    // Final Validation: Ensure final width matches the original width
+    float finalTableWidth = columnWidths.Sum();
+    if (Math.Abs(finalTableWidth - originalTableWidth) > 0.01f)
+    {
+        Console.WriteLine("Warning: Final table width exceeds original table width.");
+    }
+}
+
+private void ApplyWidthsToTable(ITable table, float[] columnWidths)
+{
+    for (int col = 0; col < table.Columns.Count; col++)
+    {
+        table.Columns[col].Width = columnWidths[col];
+    }
+}
+
+private float GetTextWidth(string text)
+{
+    // Mock implementation to calculate text width
+    // Replace this with actual text width calculation based on font size and style
+    return text.Length * 7; // Assuming each character takes ~7 units
+}
