@@ -1,0 +1,37 @@
+<div class="form-group">
+  <label for="txtCC">Core Benchmark BBG Code</label>
+  <input 
+    name="txtCC" 
+    id="txtCC" 
+    type="text" 
+    class="mat-input" 
+    placeholder="Core Benchmark BBG Code" 
+    [value]="selectedCoreBenchmark?.bbgCode || ''" 
+    [formControl]="coreBenchmarkControl" 
+    class="form-control" 
+    matInput 
+    autocomplete="off" 
+    maxlength="60" 
+    [matAutocomplete]="autoCore"
+  />
+  <mat-autocomplete #autoCore="matAutocomplete" (optionSelected)="onCoreBenchmarkSelected($event)">
+    <ng-container *ngIf="(filteredCoreBenchmarkOptions | async)?.length > 0; else noResults">
+      <mat-option 
+        *ngFor="let option of filteredCoreBenchmarkOptions | async" 
+        [value]="option">
+        {{ option.bbgCode }} | {{ option.mdsCode }} | {{ option.cinergyCode || '-' }}
+      </mat-option>
+    </ng-container>
+    <ng-template #noResults>
+      <mat-option disabled>
+        ❌ Invalid BBG Code, please input a valid one
+      </mat-option>
+    </ng-template>
+  </mat-autocomplete>
+</div>
+
+this.filteredCoreBenchmarkOptions = this.coreBenchmarkControl.valueChanges.pipe(
+  debounceTime(300),
+  switchMap(value => value.length >= 3 ? this.fetchOptions(value) : of([])),
+  map(options => options.length > 0 ? options : []) // Ensures empty array is passed if no results
+);
