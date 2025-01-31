@@ -37,3 +37,11 @@ fetchOptions(value: string): Observable<AutoCompletedOptions[]> {
     | {{ option.md5Code }} | {{ option.cinergyCode || '-' }}
   </ng-container>
 </mat-option>
+
+mat-option[disabled] {
+  color: red !important;   /* Keep the text red */
+  font-weight: bold;       /* Make it bold */
+  opacity: 1 !important;   /* Prevent it from being faded */
+  cursor: default !important; /* Prevent pointer change */
+}
+
