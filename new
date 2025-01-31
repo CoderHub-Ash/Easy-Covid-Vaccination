@@ -58,3 +58,30 @@ this.filteredCoreBenchmarkOptions = this.coreBenchmarkControl.valueChanges.pipe(
     {{ option.bbgCode }} | {{ option.mdsCode }} | {{ option.cinergyCode || '-' }}
   </mat-option>
 </mat-autocomplete>
+
+
+
+
+this.filteredCoreOptions = this.coreBenchmarkControl.valueChanges.pipe(
+    debounceTime(300),
+    distinctUntilChanged(), // Prevents duplicate API calls for the same input
+    switchMap((value: string) => {
+        if (value && value.length >= 3) {
+            return this.fetchOptions(value).pipe(
+                map(options => options.length > 0 ? options : [{ bbgCode: '❌ Invalid BBG Code', mdsCode: '', cinergyCode: '' }])
+            );
+        } else {
+            return of([]); // No options shown when input is empty or less than 3 characters
+        }
+    })
+);
+
+
+
+<mat-autocomplete #autoCore="matAutocomplete" (optionSelected)="onCoreBenchmarkSelected($event)">
+  <mat-option *ngFor="let option of filteredCoreOptions | async" 
+              [value]="option" 
+              [disabled]="option.bbgCode === '❌ Invalid BBG Code'">
+    {{ option.bbgCode }} | {{ option.mdsCode }} | {{ option.cinergyCode || '-' }}
+  </mat-option>
+</mat-autocomplete>
