@@ -27,3 +27,13 @@ fetchOptions(value: string): Observable<AutoCompletedOptions[]> {
             [disabled]="option.bbgCode === '❌ Invalid BBG Code'">
   {{ option.bbgCode }} | {{ option.md5Code }} | {{ option.cinergyCode || '-' }}
 </mat-option>
+
+
+<mat-option *ngFor="let option of filteredCoreOptions | async" 
+            [value]="option" 
+            [disabled]="option.bbgCode === '❌ Invalid BBG Code'">
+  {{ option.bbgCode }} 
+  <ng-container *ngIf="option.bbgCode !== '❌ Invalid BBG Code'">
+    | {{ option.md5Code }} | {{ option.cinergyCode || '-' }}
+  </ng-container>
+</mat-option>
