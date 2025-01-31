@@ -35,3 +35,26 @@ this.filteredCoreBenchmarkOptions = this.coreBenchmarkControl.valueChanges.pipe(
   switchMap(value => value.length >= 3 ? this.fetchOptions(value) : of([])),
   map(options => options.length > 0 ? options : []) // Ensures empty array is passed if no results
 );
+
+
+this.filteredCoreBenchmarkOptions = this.coreBenchmarkControl.valueChanges.pipe(
+  debounceTime(300),
+  distinctUntilChanged(), // Prevent unnecessary API calls for same input
+  switchMap(value => 
+    value && value.length >= 3  // Only fetch if user has typed at least 3 characters
+      ? this.fetchOptions(value).pipe(
+          map(options => options.length > 0 ? options : [{ bbgCode: '❌ Invalid BBG Code', mdsCode: '', cinergyCode: '' }])
+        )
+      : of([]) // Return empty list if input is empty
+  )
+);
+
+
+
+<mat-autocomplete #autoCore="matAutocomplete" (optionSelected)="onCoreBenchmarkSelected($event)">
+  <mat-option *ngFor="let option of filteredCoreBenchmarkOptions | async" 
+              [value]="option" 
+              [disabled]="option.bbgCode === '❌ Invalid BBG Code'">
+    {{ option.bbgCode }} | {{ option.mdsCode }} | {{ option.cinergyCode || '-' }}
+  </mat-option>
+</mat-autocomplete>
