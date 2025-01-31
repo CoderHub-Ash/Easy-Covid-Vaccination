@@ -1,87 +1,29 @@
-<div class="form-group">
-  <label for="txtCC">Core Benchmark BBG Code</label>
-  <input 
-    name="txtCC" 
-    id="txtCC" 
-    type="text" 
-    class="mat-input" 
-    placeholder="Core Benchmark BBG Code" 
-    [value]="selectedCoreBenchmark?.bbgCode || ''" 
-    [formControl]="coreBenchmarkControl" 
-    class="form-control" 
-    matInput 
-    autocomplete="off" 
-    maxlength="60" 
-    [matAutocomplete]="autoCore"
-  />
-  <mat-autocomplete #autoCore="matAutocomplete" (optionSelected)="onCoreBenchmarkSelected($event)">
-    <ng-container *ngIf="(filteredCoreBenchmarkOptions | async)?.length > 0; else noResults">
-      <mat-option 
-        *ngFor="let option of filteredCoreBenchmarkOptions | async" 
-        [value]="option">
-        {{ option.bbgCode }} | {{ option.mdsCode }} | {{ option.cinergyCode || '-' }}
-      </mat-option>
-    </ng-container>
-    <ng-template #noResults>
-      <mat-option disabled>
-        ❌ Invalid BBG Code, please input a valid one
-      </mat-option>
-    </ng-template>
-  </mat-autocomplete>
-</div>
+fetchOptions(value: string): Observable<AutoCompletedOptions[]> {
+    return this.publicationsService.getAutoCompletedOptions(value).pipe(
+        map(data => {
+            const options = data.map(item => ({
+                bbgCode: item.bbgCode,
+                md5Code: item.md5Code,
+                cinergyCode: item.cinergyCode
+            }));
 
-this.filteredCoreBenchmarkOptions = this.coreBenchmarkControl.valueChanges.pipe(
-  debounceTime(300),
-  switchMap(value => value.length >= 3 ? this.fetchOptions(value) : of([])),
-  map(options => options.length > 0 ? options : []) // Ensures empty array is passed if no results
-);
+            // If no results, return a special "Invalid BBG Code" entry
+            return options.length > 0 ? options : [{ 
+                bbgCode: '❌ Invalid BBG Code', 
+                md5Code: '', 
+                cinergyCode: '' 
+            }];
+        }),
+        catchError(() => of([{ 
+            bbgCode: '❌ Invalid BBG Code', 
+            md5Code: '', 
+            cinergyCode: '' 
+        }])) // Handles API errors gracefully
+    );
+}
 
-
-this.filteredCoreBenchmarkOptions = this.coreBenchmarkControl.valueChanges.pipe(
-  debounceTime(300),
-  distinctUntilChanged(), // Prevent unnecessary API calls for same input
-  switchMap(value => 
-    value && value.length >= 3  // Only fetch if user has typed at least 3 characters
-      ? this.fetchOptions(value).pipe(
-          map(options => options.length > 0 ? options : [{ bbgCode: '❌ Invalid BBG Code', mdsCode: '', cinergyCode: '' }])
-        )
-      : of([]) // Return empty list if input is empty
-  )
-);
-
-
-
-<mat-autocomplete #autoCore="matAutocomplete" (optionSelected)="onCoreBenchmarkSelected($event)">
-  <mat-option *ngFor="let option of filteredCoreBenchmarkOptions | async" 
-              [value]="option" 
-              [disabled]="option.bbgCode === '❌ Invalid BBG Code'">
-    {{ option.bbgCode }} | {{ option.mdsCode }} | {{ option.cinergyCode || '-' }}
-  </mat-option>
-</mat-autocomplete>
-
-
-
-
-this.filteredCoreOptions = this.coreBenchmarkControl.valueChanges.pipe(
-    debounceTime(300),
-    distinctUntilChanged(), // Prevents duplicate API calls for the same input
-    switchMap((value: string) => {
-        if (value && value.length >= 3) {
-            return this.fetchOptions(value).pipe(
-                map(options => options.length > 0 ? options : [{ bbgCode: '❌ Invalid BBG Code', mdsCode: '', cinergyCode: '' }])
-            );
-        } else {
-            return of([]); // No options shown when input is empty or less than 3 characters
-        }
-    })
-);
-
-
-
-<mat-autocomplete #autoCore="matAutocomplete" (optionSelected)="onCoreBenchmarkSelected($event)">
-  <mat-option *ngFor="let option of filteredCoreOptions | async" 
-              [value]="option" 
-              [disabled]="option.bbgCode === '❌ Invalid BBG Code'">
-    {{ option.bbgCode }} | {{ option.mdsCode }} | {{ option.cinergyCode || '-' }}
-  </mat-option>
-</mat-autocomplete>
+<mat-option *ngFor="let option of filteredCoreOptions | async" 
+            [value]="option" 
+            [disabled]="option.bbgCode === '❌ Invalid BBG Code'">
+  {{ option.bbgCode }} | {{ option.md5Code }} | {{ option.cinergyCode || '-' }}
+</mat-option>
