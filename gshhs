@@ -1,0 +1,9 @@
+// No tickers were selected
+if ((newPublication.BusinessCategoryId == (int)BusinessCategoryEnum.QIS_INDICES ||
+     newPublication.BusinessCategoryId == (int)BusinessCategoryEnum.STOCK ||
+     newPublication.BusinessCategoryId == (int)BusinessCategoryEnum.MARKET) && 
+     mdsCodes.Count() == 0)
+{
+    _applicationLogger.Log(LogTypeEnum.INFO.ToString(), currentMethod, "No strategy ticker was selected", null, callerIp);
+    return StatusCode(405, "Please provide valid strategy code");
+}
