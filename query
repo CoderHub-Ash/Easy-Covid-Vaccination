@@ -19,3 +19,31 @@ INNER JOIN QUOTATION.dbo.ProductImportConfiguration pic
 WHERE pp.MdsCode IS NULL OR pp.CinergyCode IS NULL;
 
 COMMIT TRANSACTION;
+
+Aggregation Table : 
+
+1.
+SELECT ata.AggregationTicker, ata.AggregationMdsCode, ata.AggregationCinergyCode, 
+       ata.MdsCode, pic.MdsCode, ata.CinergyCode, pic.CinergyCode
+FROM MceStudio.dbo.AggregationTickerAllocation ata
+LEFT JOIN QUOTATION.dbo.ProductImportConfiguration pic
+    ON ata.AggregationTicker = pic.BloombergCode
+WHERE ata.MdsCode IS NULL OR ata.CinergyCode IS NULL
+      OR ata.AggregationMdsCode IS NULL OR ata.AggregationCinergyCode IS NULL;
+
+2. 
+BEGIN TRANSACTION;
+
+UPDATE ata
+SET 
+    ata.AggregationMdsCode = ata.AggregationTicker,
+    ata.AggregationCinergyCode = ata.AggregationTicker,
+    ata.MdsCode = pic.MdsCode,
+    ata.CinergyCode = pic.CinergyCode
+FROM MceStudio.dbo.AggregationTickerAllocation ata
+LEFT JOIN QUOTATION.dbo.ProductImportConfiguration pic
+    ON ata.AggregationTicker = pic.BloombergCode
+WHERE ata.MdsCode IS NULL OR ata.CinergyCode IS NULL
+      OR ata.AggregationMdsCode IS NULL OR ata.AggregationCinergyCode IS NULL;
+
+COMMIT TRANSACTION;
