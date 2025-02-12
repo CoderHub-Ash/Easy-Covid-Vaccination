@@ -88,3 +88,11 @@ WHERE df.PriceReturnMdsCode IS NULL OR df.PriceReturnCinergyCode IS NULL
       OR df.NetTotalReturnMdsCode IS NULL OR df.NetTotalReturnCinergyCode IS NULL;
 
 COMMIT TRANSACTION;
+
+Bsiness Categories
+
+INSERT INTO MceStudio.dbo.BusinessCategories 
+    (Name, IsActive, CreatedBy, UpdatedBy, CreatedOn, UpdatedOn, Label, Label1, Parent)
+VALUES 
+    ('Market Index', 1, 'f39969', 'f39969', GETDATE(), GETDATE(), 'Market Index', 'Market Index', NULL),
+    ('Stocks', 1, 'f39969', 'f39969', GETDATE(), GETDATE(), 'Stocks', 'Stocks', NULL);
