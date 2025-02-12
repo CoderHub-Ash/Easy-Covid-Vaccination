@@ -30,3 +30,10 @@ Improvements Made:
  * Focus on Benefits: Highlights the positive impact of the changes.
  * Emphasis on Important Information:  Draws attention to potential issues and their solutions.
 This revised email is more likely to be understood and acted upon quickly. Remember to replace the bracketed placeholders with the actual information.
+
+
+SELECT mm.Ticker
+FROM MceStudio.dbo.MdsMaster mm
+LEFT JOIN QUOTATION.dbo.ProductImportConfiguration pic
+    ON mm.Ticker = pic.BloombergCode
+WHERE pic.BloombergCode IS NULL;
