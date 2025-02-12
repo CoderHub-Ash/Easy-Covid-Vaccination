@@ -1,0 +1,7 @@
+1.
+
+SELECT pp.BloombergCode, pp.MdsCode, pic.MdsCode, pp.CinergyCode, pic.CinergyCode
+FROM MceStudio.dbo.PublicationProducts pp
+INNER JOIN QUOTATION.dbo.ProductImportConfiguration pic
+    ON pp.BloombergCode = pic.BloombergCode
+WHERE pp.MdsCode IS NULL OR pp.CinergyCode IS NULL;
