@@ -47,3 +47,44 @@ WHERE ata.MdsCode IS NULL OR ata.CinergyCode IS NULL
       OR ata.AggregationMdsCode IS NULL OR ata.AggregationCinergyCode IS NULL;
 
 COMMIT TRANSACTION;
+
+
+DecrementFields
+1.
+SELECT df.PriceReturnTicker, df.PriceReturnMdsCode, pic1.MdsCode, df.PriceReturnCinergyCode, pic1.CinergyCode,
+       df.GrossReturnTicker, df.GrossReturnMdsCode, pic2.MdsCode, df.GrossReturnCinergyCode, pic2.CinergyCode,
+       df.NetReturnTicker, df.NetTotalReturnMdsCode, pic3.MdsCode, df.NetTotalReturnCinergyCode, pic3.CinergyCode
+FROM MceStudio.dbo.DecrementFields df
+LEFT JOIN QUOTATION.dbo.ProductImportConfiguration pic1
+    ON df.PriceReturnTicker = pic1.BloombergCode
+LEFT JOIN QUOTATION.dbo.ProductImportConfiguration pic2
+    ON df.GrossReturnTicker = pic2.BloombergCode
+LEFT JOIN QUOTATION.dbo.ProductImportConfiguration pic3
+    ON df.NetReturnTicker = pic3.BloombergCode
+WHERE df.PriceReturnMdsCode IS NULL OR df.PriceReturnCinergyCode IS NULL
+      OR df.GrossReturnMdsCode IS NULL OR df.GrossReturnCinergyCode IS NULL
+      OR df.NetTotalReturnMdsCode IS NULL OR df.NetTotalReturnCinergyCode IS NULL;
+
+2.
+BEGIN TRANSACTION;
+
+UPDATE df
+SET 
+    df.PriceReturnMdsCode = pic1.MdsCode,
+    df.PriceReturnCinergyCode = pic1.CinergyCode,
+    df.GrossReturnMdsCode = pic2.MdsCode,
+    df.GrossReturnCinergyCode = pic2.CinergyCode,
+    df.NetTotalReturnMdsCode = pic3.MdsCode,
+    df.NetTotalReturnCinergyCode = pic3.CinergyCode
+FROM MceStudio.dbo.DecrementFields df
+LEFT JOIN QUOTATION.dbo.ProductImportConfiguration pic1
+    ON df.PriceReturnTicker = pic1.BloombergCode
+LEFT JOIN QUOTATION.dbo.ProductImportConfiguration pic2
+    ON df.GrossReturnTicker = pic2.BloombergCode
+LEFT JOIN QUOTATION.dbo.ProductImportConfiguration pic3
+    ON df.NetReturnTicker = pic3.BloombergCode
+WHERE df.PriceReturnMdsCode IS NULL OR df.PriceReturnCinergyCode IS NULL
+      OR df.GrossReturnMdsCode IS NULL OR df.GrossReturnCinergyCode IS NULL
+      OR df.NetTotalReturnMdsCode IS NULL OR df.NetTotalReturnCinergyCode IS NULL;
+
+COMMIT TRANSACTION;
