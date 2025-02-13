@@ -1,0 +1,82 @@
+The issue is that you're using matInput on the input element, which is meant for Material Design inputs. Material Design inputs typically don't have borders by default unless they are focused or have an error state.
+Here are a few ways to add a border to your input field, along with explanations and recommendations:
+1. Using Standard CSS (Recommended for Customization):
+This approach gives you the most control over the border's appearance.
+<input
+  name="txtSC"
+  id="txtSc"
+  type="text"
+  class="form-control with-border"  placeholder="Strategy BBG Code"
+  [value]="selectedStrategy?.bbgCode"
+  [formControl]="strategyControl"
+  [class.is-invalid]="strategyControl.invalid && (strategyControl.dirty || strategyControl.touched)"  autocomplete="off"
+  maxlength="60"
+  required
+  [matAutocomplete]="auto"
+/>
+
+/* In your component's CSS file or global stylesheet */
+.with-border {
+  border: 1px solid #ced4da; /* Light gray border - customize as needed */
+  border-radius: 4px; /* Optional: Add rounded corners */
+  padding: 0.375rem 0.75rem; /* Optional: Adjust padding for better look */
+}
+
+/* Optional: Style the border on focus */
+.with-border:focus {
+  border-color: #80bdff; /* Blue border on focus (Bootstrap's default) */
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); /* Subtle shadow on focus */
+}
+
+/* Keep your existing Bootstrap or custom validation styles */
+.is-invalid {
+  border-color: #dc3545; /* Red border for invalid input */
+}
+
+Explanation:
+ * We added a custom class with-border to the input element.
+ * In the CSS, we define the with-border class to have a 1px solid border. You can change the color, thickness, and style as needed.
+ * border-radius is optional and adds rounded corners.
+ * The :focus style adds a border color change and shadow when the input is focused, improving user experience.
+ * We kept your existing is-invalid class for validation styling, ensuring it overrides the default border color when the input is invalid.
+2. Using Bootstrap's Form Styling (If Applicable):
+If you're using Bootstrap, you can leverage its form styling classes.
+<input
+  name="txtSC"
+  id="txtSc"
+  type="text"
+  class="form-control"  placeholder="Strategy BBG Code"
+  [value]="selectedStrategy?.bbgCode"
+  [formControl]="strategyControl"
+  [class.is-invalid]="strategyControl.invalid && (strategyControl.dirty || strategyControl.touched)"
+  autocomplete="off"
+  maxlength="60"
+  required
+  [matAutocomplete]="auto"
+/>
+
+Bootstrap's form-control class provides basic styling, including a border. You can further customize it with Bootstrap's utility classes or custom CSS.
+3. Wrapping the input in a div with a border (Less Recommended):
+You can wrap the input in a div and apply the border to the div. However, this can sometimes interfere with form layout and styling, so it's generally less recommended.
+<div class="input-wrapper">
+  <input 
+    /* ... your input attributes ... */ 
+  />
+</div>
+
+.input-wrapper {
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  padding: 5px; /* Adjust padding as needed */
+}
+
+Important Considerations:
+ * Material Design Conflicts: If you're using Angular Material extensively, be mindful of potential conflicts with Material Design styling. The first approach (custom CSS) is the most flexible and allows you to adjust the border to fit your overall design.
+ * Validation Styling: Ensure your validation styles (e.g., using is-invalid) continue to work correctly and override the default border styles when necessary.
+ * Accessibility: Ensure sufficient contrast between the border and the background for accessibility.
+Debugging Tips:
+ * Inspect Element: Use your browser's developer tools (right-click on the input and select "Inspect" or "Inspect Element") to examine the element's styles and see if any other CSS rules are overriding your border settings.
+ * Check for Conflicts: Look for any conflicting CSS rules in your component's CSS, global stylesheet, or third-party libraries (like Material Design or Bootstrap).
+ * Simplify: Create a minimal test case with only the input element and the border styles to isolate the issue.
+Choose the approach that best suits your needs and styling preferences. The custom CSS approach (option 1) provides the most flexibility and control, especially if you need to fine-tune the border's appearance or if you're working with Material Design components. Remember to inspect the element and debug any conflicting styles using your browser's developer tools.
