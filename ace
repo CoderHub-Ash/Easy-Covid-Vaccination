@@ -127,3 +127,23 @@ onStrategySelected(event: MatAutocompleteSelectedEvent) {
   this.selectedStrategy = option; 
   this.strategyControl.setValue(option.bbgCode); // Display only bbgCode in input
 }
+
+
+ngOnInit() {
+  if (this.selectedStrategy) {
+    console.log('Setting initial value:', this.selectedStrategy);
+    this.strategyControl.setValue(this.displayStrategy(this.selectedStrategy));
+  }
+
+  this.filteredOptions = this.strategyControl.valueChanges.pipe(
+    startWith(''),
+    debounceTime(300),
+    switchMap((value: string) => {
+      if (value && typeof value === 'string' && value.length >= 3) {
+        return this.fetchOptions(value);
+      } else {
+        return of([]);
+      }
+    })
+  );
+}
