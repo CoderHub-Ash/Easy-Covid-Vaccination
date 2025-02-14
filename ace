@@ -50,3 +50,10 @@ if (element.decrementTypeId === DecrementTypeEnum.POINTS) {
     this.selectedNetTotalReturn.cinergyCode = element.decrementFields.netTotalReturnCinergyCode;
   }
 }
+
+
+optionSelected(event: MatAutocompleteSelectedEvent) {
+  if (!this.selectedStrategy || this.selectedStrategy.bbgCode !== event.option.value.bbgCode) {
+    this.selectedStrategy = event.option.value;
+  }
+}
