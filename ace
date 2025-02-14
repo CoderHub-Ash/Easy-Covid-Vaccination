@@ -1,155 +1,20 @@
-if (this.publication.otherBenchmark && this.publication.otherBenchmark.length > 0) {
-  setTimeout(() => {
-    const chips = this.tagInput.nativeElement.querySelectorAll('mat-chip');
-    
-    this.publication.otherBenchmark.forEach((element, index) => {
-      const chip = chips[index]; // Get chip by index
-      
-      if (chip) {
-        this.renderer.setStyle(chip, 'color', 'black');
-        this.renderer.setStyle(chip, 'background', '#efefef');
-        
-        const icon = chip.querySelector('mat-icon');
-        if (icon) {
-          this.renderer.setStyle(icon, 'color', '#444');
-        }
-      }
-    });
-  }, 0); // Use timeout to ensure elements exist
+displayAggregationTicker(option?: any): string {
+  return option && typeof option === 'object' ? option.bbgCode : '';
 }
 
+<input
+  class="form-control col-7"
+  placeholder="BBG Code"
+  id="ticker-{{ this.type }}-{{ 1 }}"
+  name="ticker"
+  [(ngModel)]="aggregationIndex.aggregationFormula[i].ticker"
+  [matAutocomplete]="auto"
+  (input)="onInput($event.target.value, i)"
+  required
+/>
 
-
-// Ensure selectedPriceReturn is initialized
-this.selectedPriceReturn = this.selectedPriceReturn || { bbgCode: '', mdsCode: '', cinergyCode: '' };
-
-// Ensure selectedGrossTotalReturn is initialized
-this.selectedGrossTotalReturn = this.selectedGrossTotalReturn || { bbgCode: '', mdsCode: '', cinergyCode: '' };
-
-// Ensure selectedNetTotalReturn is initialized
-this.selectedNetTotalReturn = this.selectedNetTotalReturn || { bbgCode: '', mdsCode: '', cinergyCode: '' };
-
-if (element.decrementTypeId === DecrementTypeEnum.POINTS) {
-  if (element.decrementFields) {
-    this.selectedPriceReturn.bbgCode = element.decrementFields.priceReturnTicker;
-    this.selectedPriceReturn.mdsCode = element.decrementFields.priceReturnMdsCode;
-    this.selectedPriceReturn.cinergyCode = element.decrementFields.priceReturnCinergyCode;
-
-    this.selectedGrossTotalReturn.bbgCode = element.decrementFields.grossTotalReturnTicker;
-    this.selectedGrossTotalReturn.mdsCode = element.decrementFields.grossTotalReturnMdsCode;
-    this.selectedGrossTotalReturn.cinergyCode = element.decrementFields.grossTotalReturnCinergyCode; // Fix here
-  }
-} else if (this.publication.decrementTypeId === DecrementTypeEnum.PERCENTAGE) {
-  if (element.decrementFields) {
-    this.selectedPriceReturn.bbgCode = element.decrementFields.priceReturnTicker;
-    this.selectedPriceReturn.mdsCode = element.decrementFields.priceReturnMdsCode;
-    this.selectedPriceReturn.cinergyCode = element.decrementFields.priceReturnCinergyCode;
-
-    this.selectedNetTotalReturn.bbgCode = element.decrementFields.netTotalReturnTicker;
-    this.selectedNetTotalReturn.mdsCode = element.decrementFields.netTotalReturnMdsCode;
-    this.selectedNetTotalReturn.cinergyCode = element.decrementFields.netTotalReturnCinergyCode;
-  }
-}
-
-
-optionSelected(event: MatAutocompleteSelectedEvent) {
-  if (!this.selectedStrategy || this.selectedStrategy.bbgCode !== event.option.value.bbgCode) {
-    this.selectedStrategy = event.option.value;
-  }
-}
-
-
-updateSelectedValue(selectedValue: any, inputType: string) {
-  if (!selectedValue) return; // Prevent null selections
-
-  switch (inputType) {
-    case 'strategy':
-      if (!this.selectedStrategy || this.selectedStrategy.bbgCode !== selectedValue.bbgCode) {
-        this.selectedStrategy = selectedValue;
-        this.strategyControl.setValue(selectedValue);
-      }
-      break;
-
-    case 'coreBenchmark':
-      if (!this.selectedCoreBenchmark || this.selectedCoreBenchmark.bbgCode !== selectedValue.bbgCode) {
-        this.selectedCoreBenchmark = selectedValue;
-        this.coreBenchmarkControl.setValue(selectedValue);
-      }
-      break;
-
-    case 'otherBenchmark':
-      if (!this.selectedOtherBenchmark || this.selectedOtherBenchmark.bbgCode !== selectedValue.bbgCode) {
-        this.selectedOtherBenchmark = selectedValue;
-        this.otherBenchmarkControl.setValue(selectedValue);
-      }
-      break;
-
-    default:
-      console.warn('Invalid inputType:', inputType);
-  }
-}
-
-
-
-strategyControl = new FormControl('');
-selectedStrategy: any = null;
-
-ngOnInit() {
-  if (this.selectedStrategy) {
-    console.log('Setting initial value:', this.selectedStrategy);
-    this.strategyControl.setValue(this.selectedStrategy.bbgCode);
-  }
-
-  this.filteredOptions = this.strategyControl.valueChanges.pipe(
-    startWith(''),
-    debounceTime(300),
-    switchMap((value: string) => {
-      if (value && value.length >= 3) {
-        return this.fetchOptions(value);
-      } else {
-        return of([]);
-      }
-    })
-  );
-}
-
-// Display Method
-displayStrategy(option?: any): string {
-  console.log('displayStrategy called with:', option);
-  return option ? option.bbgCode : '';
-}
-
-// Called when an option is selected
-onStrategySelected(event: MatAutocompleteSelectedEvent) {
-  const option = event.option.value;
-  console.log('Option selected:', option);
-
-  this.selectedStrategy = option; 
-  this.strategyControl.setValue(option.bbgCode); // Display only bbgCode in input
-}
-
-
-ngOnInit() {
-  if (this.selectedStrategy) {
-    console.log('Setting initial value:', this.selectedStrategy);
-    this.strategyControl.setValue(this.displayStrategy(this.selectedStrategy));
-  }
-
-  this.filteredOptions = this.strategyControl.valueChanges.pipe(
-    startWith(''),
-    debounceTime(300),
-    switchMap((value: string) => {
-      if (value && typeof value === 'string' && value.length >= 3) {
-        return this.fetchOptions(value);
-      } else {
-        return of([]);
-      }
-    })
-  );
-}
-
-onAggregationTickerBlur() {
-  if (typeof this.aggregationTickerControl.value === 'object') {
-    this.aggregationTickerControl.setValue(this.displayAggregationTicker(this.aggregationTickerControl.value));
-  }
-}
+<mat-autocomplete #auto="matAutocomplete" (optionSelected)="onSelect($event.option.value, i)" [displayWith]="displayAggregationTicker">
+  <mat-option *ngFor="let option of filteredOptions[i]" [value]="option">
+    {{ option.bbgCode }} 
+  </mat-option>
+</mat-autocomplete>
