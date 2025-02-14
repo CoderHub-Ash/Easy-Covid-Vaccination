@@ -88,3 +88,42 @@ updateSelectedValue(selectedValue: any, inputType: string) {
       console.warn('Invalid inputType:', inputType);
   }
 }
+
+
+
+strategyControl = new FormControl('');
+selectedStrategy: any = null;
+
+ngOnInit() {
+  if (this.selectedStrategy) {
+    console.log('Setting initial value:', this.selectedStrategy);
+    this.strategyControl.setValue(this.selectedStrategy.bbgCode);
+  }
+
+  this.filteredOptions = this.strategyControl.valueChanges.pipe(
+    startWith(''),
+    debounceTime(300),
+    switchMap((value: string) => {
+      if (value && value.length >= 3) {
+        return this.fetchOptions(value);
+      } else {
+        return of([]);
+      }
+    })
+  );
+}
+
+// Display Method
+displayStrategy(option?: any): string {
+  console.log('displayStrategy called with:', option);
+  return option ? option.bbgCode : '';
+}
+
+// Called when an option is selected
+onStrategySelected(event: MatAutocompleteSelectedEvent) {
+  const option = event.option.value;
+  console.log('Option selected:', option);
+
+  this.selectedStrategy = option; 
+  this.strategyControl.setValue(option.bbgCode); // Display only bbgCode in input
+}
