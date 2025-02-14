@@ -57,3 +57,34 @@ optionSelected(event: MatAutocompleteSelectedEvent) {
     this.selectedStrategy = event.option.value;
   }
 }
+
+
+updateSelectedValue(selectedValue: any, inputType: string) {
+  if (!selectedValue) return; // Prevent null selections
+
+  switch (inputType) {
+    case 'strategy':
+      if (!this.selectedStrategy || this.selectedStrategy.bbgCode !== selectedValue.bbgCode) {
+        this.selectedStrategy = selectedValue;
+        this.strategyControl.setValue(selectedValue);
+      }
+      break;
+
+    case 'coreBenchmark':
+      if (!this.selectedCoreBenchmark || this.selectedCoreBenchmark.bbgCode !== selectedValue.bbgCode) {
+        this.selectedCoreBenchmark = selectedValue;
+        this.coreBenchmarkControl.setValue(selectedValue);
+      }
+      break;
+
+    case 'otherBenchmark':
+      if (!this.selectedOtherBenchmark || this.selectedOtherBenchmark.bbgCode !== selectedValue.bbgCode) {
+        this.selectedOtherBenchmark = selectedValue;
+        this.otherBenchmarkControl.setValue(selectedValue);
+      }
+      break;
+
+    default:
+      console.warn('Invalid inputType:', inputType);
+  }
+}
