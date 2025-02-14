@@ -17,3 +17,36 @@ if (this.publication.otherBenchmark && this.publication.otherBenchmark.length > 
     });
   }, 0); // Use timeout to ensure elements exist
 }
+
+
+
+// Ensure selectedPriceReturn is initialized
+this.selectedPriceReturn = this.selectedPriceReturn || { bbgCode: '', mdsCode: '', cinergyCode: '' };
+
+// Ensure selectedGrossTotalReturn is initialized
+this.selectedGrossTotalReturn = this.selectedGrossTotalReturn || { bbgCode: '', mdsCode: '', cinergyCode: '' };
+
+// Ensure selectedNetTotalReturn is initialized
+this.selectedNetTotalReturn = this.selectedNetTotalReturn || { bbgCode: '', mdsCode: '', cinergyCode: '' };
+
+if (element.decrementTypeId === DecrementTypeEnum.POINTS) {
+  if (element.decrementFields) {
+    this.selectedPriceReturn.bbgCode = element.decrementFields.priceReturnTicker;
+    this.selectedPriceReturn.mdsCode = element.decrementFields.priceReturnMdsCode;
+    this.selectedPriceReturn.cinergyCode = element.decrementFields.priceReturnCinergyCode;
+
+    this.selectedGrossTotalReturn.bbgCode = element.decrementFields.grossTotalReturnTicker;
+    this.selectedGrossTotalReturn.mdsCode = element.decrementFields.grossTotalReturnMdsCode;
+    this.selectedGrossTotalReturn.cinergyCode = element.decrementFields.grossTotalReturnCinergyCode; // Fix here
+  }
+} else if (this.publication.decrementTypeId === DecrementTypeEnum.PERCENTAGE) {
+  if (element.decrementFields) {
+    this.selectedPriceReturn.bbgCode = element.decrementFields.priceReturnTicker;
+    this.selectedPriceReturn.mdsCode = element.decrementFields.priceReturnMdsCode;
+    this.selectedPriceReturn.cinergyCode = element.decrementFields.priceReturnCinergyCode;
+
+    this.selectedNetTotalReturn.bbgCode = element.decrementFields.netTotalReturnTicker;
+    this.selectedNetTotalReturn.mdsCode = element.decrementFields.netTotalReturnMdsCode;
+    this.selectedNetTotalReturn.cinergyCode = element.decrementFields.netTotalReturnCinergyCode;
+  }
+}
