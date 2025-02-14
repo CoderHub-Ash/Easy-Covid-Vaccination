@@ -1,0 +1,19 @@
+if (this.publication.otherBenchmark && this.publication.otherBenchmark.length > 0) {
+  setTimeout(() => {
+    const chips = this.tagInput.nativeElement.querySelectorAll('mat-chip');
+    
+    this.publication.otherBenchmark.forEach((element, index) => {
+      const chip = chips[index]; // Get chip by index
+      
+      if (chip) {
+        this.renderer.setStyle(chip, 'color', 'black');
+        this.renderer.setStyle(chip, 'background', '#efefef');
+        
+        const icon = chip.querySelector('mat-icon');
+        if (icon) {
+          this.renderer.setStyle(icon, 'color', '#444');
+        }
+      }
+    });
+  }, 0); // Use timeout to ensure elements exist
+}
