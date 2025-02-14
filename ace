@@ -147,3 +147,9 @@ ngOnInit() {
     })
   );
 }
+
+onAggregationTickerBlur() {
+  if (typeof this.aggregationTickerControl.value === 'object') {
+    this.aggregationTickerControl.setValue(this.displayAggregationTicker(this.aggregationTickerControl.value));
+  }
+}
