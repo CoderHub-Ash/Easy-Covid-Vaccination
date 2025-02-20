@@ -26,3 +26,11 @@ var registriesToInsert = dataFromExcel
             Name = d.Currency == null ? defaultCurrency : d.Currency
         }
     });
+
+LaunchDate = DateTime.TryParseExact(
+    d.LaunchDate, 
+    "dd/MM/yyyy HH:mm:ss",
+    CultureInfo.InvariantCulture, 
+    DateTimeStyles.None, 
+    out DateTime parsedDate
+) ? parsedDate.Date : (DateTime?)null;
