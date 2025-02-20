@@ -5,3 +5,24 @@ if (
 ) {
   // Your logic here
 }
+
+
+var registriesToInsert = dataFromExcel
+    .Where(x => x.BloombergCode != null && x.MdsCode != null)
+    .Select(d => new TickerInfoDTO
+    {
+        TickerName = d.TickerName,
+        BloombergCode = d.BloombergCode,
+        MdsCode = d.MdsCode,
+        LaunchDate = DateTime.TryParseExact(
+            d.LaunchDate, 
+            "dd/MM/yyyy", // Adjust this based on your actual date format
+            CultureInfo.InvariantCulture, 
+            DateTimeStyles.None, 
+            out DateTime parsedDate
+        ) ? parsedDate : (DateTime?)null,
+        Currency = new CurrencyDTO
+        {
+            Name = d.Currency == null ? defaultCurrency : d.Currency
+        }
+    });
