@@ -34,3 +34,13 @@ LaunchDate = DateTime.TryParseExact(
     DateTimeStyles.None, 
     out DateTime parsedDate
 ) ? parsedDate.Date : (DateTime?)null;
+
+UPDATE ProductImportConfiguration
+SET LaunchDate = CASE 
+    WHEN BloombergCode = 'BNPIHELS Index' THEN '2016-12-09'
+    WHEN BloombergCode = 'EU_SOBK2020' THEN '2020-05-15'
+    WHEN BloombergCode = 'EU_BNPIWEBI_PROTECTED_80' THEN '2021-11-30'
+    WHEN BloombergCode = 'EU_SOTF2020' THEN '2020-06-17'
+    WHEN BloombergCode = 'EU_EWCC5VT' THEN '2021-07-12'
+END
+WHERE BloombergCode IN ('BNPIHELS Index', 'EU_SOBK2020', 'EU_BNPIWEBI_PROTECTED_80', 'EU_SOTF2020', 'EU_EWCC5VT');
