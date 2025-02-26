@@ -44,3 +44,26 @@ SET LaunchDate = CASE
     WHEN BloombergCode = 'EU_EWCC5VT' THEN '2021-07-12'
 END
 WHERE BloombergCode IN ('BNPIHELS Index', 'EU_SOBK2020', 'EU_BNPIWEBI_PROTECTED_80', 'EU_SOTF2020', 'EU_EWCC5VT');
+
+
+
+$.ajax({
+    url: url,
+    type: "POST",   // Explicitly define the request type
+    dataType: "json", // Ensure dataType is a string (e.g., "json", "html", "text")
+    success: function (data) {
+        var navigationUrl = getNavigationUrl($(location).attr("search"));
+        if (!navigationUrl) {  // Use !navigationUrl instead of comparing with undefined
+            $(location).attr("href", "/defaultPage");
+        } else {
+            $(location).attr("href", navigationUrl);
+        }
+    },
+    error: function (xhr) { // Handle errors properly
+        if (xhr.status == 500) {
+            $(location).attr("href", "/error500");
+        } else if (xhr.status == 404) {
+            $(location).attr("href", "/errorNotFound");
+        }
+    }
+});
