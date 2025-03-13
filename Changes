@@ -67,3 +67,8 @@ $.ajax({
         }
     }
 });
+
+displayAggregationTicker(option?: any): string {
+  console.log('displayAggregationTicker called with:', option);
+  return option && typeof option === 'object' ? option.bbgCode : (option || '');
+}
