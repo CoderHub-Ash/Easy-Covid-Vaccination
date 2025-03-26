@@ -1,111 +1,31 @@
-Here's a solution to create a similar dropdown menu using HTML, CSS, and JavaScript:
-
-```html
-<div class="dropdown-container">
-  <!-- First dropdown section -->
-  <div class="dropdown-section">
-    <div class="dropdown-header" onclick="toggleDropdown('section1')">
-      ENGLISH
-      <span class="arrow">▼</span>
-    </div>
-    <div class="dropdown-content" id="section1">
-      <ul>
-        <li>PRIIPs, KID</li>
-        <li>FX PND-FX SYMPHOT/PULS</li>
-        <li>CONTACT US</li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- Second dropdown section -->
-  <div class="dropdown-section">
-    <div class="dropdown-header" onclick="toggleDropdown('section2')">
-      2025 website
-      <span class="arrow">▼</span>
-    </div>
-    <div class="dropdown-content" id="section2">
-      <p><strong>Image 2025-02-17-16:15</strong></p>
-      <p><strong>image 2025-02-17-16:15</strong></p>
-      <p>17/Feb/25 11:45 AM</p>
-      <p>88 KB</p>
-      <p>17/Feb/25 11:46 AM</p>
-      <p>73 KB</p>
-    </div>
-  </div>
-</div>
-
-<style>
-.dropdown-container {
-  border: 2px solid #cc0000;
-  border-radius: 8px;
-  padding: 10px;
-  width: 300px;
-}
-
-.dropdown-header {
-  padding: 10px;
-  cursor: pointer;
-  color: #cc0000;
-  font-weight: bold;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.dropdown-content {
-  display: none;
-  padding: 10px;
-  border-top: 1px solid #eee;
-}
-
-.dropdown-content ul {
-  list-style-type: none;
-  padding-left: 0;
+.language {
+  list-style: none; /* Remove default list styling */
+  padding: 0;
   margin: 0;
+  display: inline-block; /* Display the list horizontally */
+  border: 1px solid #ccc; /* Add a border */
+  border-radius: 5px; /* Round the corners */
+  overflow: hidden; /* Hide overflow from border */
 }
 
-.dropdown-content li {
-  padding: 5px 0;
+.language li {
+  display: inline-block; /* Display list items horizontally */
 }
 
-.arrow {
-  font-size: 0.8em;
+.language li a {
+  display: block; /* Make the anchor fill the list item */
+  padding: 8px 12px; /* Add padding for spacing */
+  text-decoration: none; /* Remove underlines from links */
+  color: #333; /* Default text color */
+  font-size: 14px; /* Adjust font size as needed */
 }
 
-.dropdown-content.show {
-  display: block;
-  animation: fadeIn 0.3s;
+.language li a.active,
+.language li.active a { /* Apply active style to link or li */
+  background-color: #4CAF50; /* Green background for active */
+  color: white; /* White text for active */
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+.language li a:hover {
+  background-color: #f0f0f0; /* Light gray on hover */
 }
-</style>
-
-<script>
-function toggleDropdown(sectionId) {
-  const content = document.getElementById(sectionId);
-  const arrow = content.previousElementSibling.querySelector('.arrow');
-  
-  content.classList.toggle('show');
-  arrow.textContent = content.classList.contains('show') ? '▲' : '▼';
-}
-</script>
-```
-
-Key features:
-1. Red border container matching the BNP Paribas Fortis style
-2. Collapsible sections with animated arrows
-3. Similar content structure with bold text and lists
-4. Responsive design
-5. Smooth animations
-
-To customize:
-- Adjust colors by changing the `#cc0000` values
-- Modify widths in the `.dropdown-container`
-- Adjust padding/margins for spacing
-- Change font sizes/styles as needed
-- Add more sections by duplicating the `dropdown-section` div
-
-You can add more styling to match your exact brand guidelines by modifying the CSS variables and properties. The JavaScript handles the toggle functionality with smooth transitions.
