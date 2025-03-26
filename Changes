@@ -1,31 +1,128 @@
-.language {
-  list-style: none; /* Remove default list styling */
-  padding: 0;
-  margin: 0;
-  display: inline-block; /* Display the list horizontally */
-  border: 1px solid #ccc; /* Add a border */
-  border-radius: 5px; /* Round the corners */
-  overflow: hidden; /* Hide overflow from border */
+@{
+    ViewData["Title"] = "Recherche de KID";
 }
 
-.language li {
-  display: inline-block; /* Display list items horizontally */
+<div class="container mt-4">
+    <h4>Recherche de KID</h4>
+    <form method="post" asp-action="SearchKID">
+        <div class="row">
+            <!-- Produit Dropdown -->
+            <div class="col-md-3">
+                <label for="product">Produit</label>
+                <select class="form-control" id="product" name="Product">
+                    <option value="">Sélectionner un produit</option>
+                    <option value="FX Forward">FX Forward</option>
+                    <option value="Option">Option</option>
+                </select>
+            </div>
+
+            <!-- Devise 1 Dropdown -->
+            <div class="col-md-2">
+                <label for="devise1">Devise 1</label>
+                <select class="form-control" id="devise1" name="Devise1">
+                    <option value="">Sélectionner</option>
+                    <option value="USD">USD</option>
+                    <option value="EUR">EUR</option>
+                    <option value="GBP">GBP</option>
+                </select>
+            </div>
+
+            <!-- Devise 2 Dropdown -->
+            <div class="col-md-2">
+                <label for="devise2">Devise 2</label>
+                <select class="form-control" id="devise2" name="Devise2">
+                    <option value="">Sélectionner</option>
+                    <option value="USD">USD</option>
+                    <option value="EUR">EUR</option>
+                    <option value="GBP">GBP</option>
+                </select>
+            </div>
+
+            <!-- Maturité Dropdown -->
+            <div class="col-md-2">
+                <label for="maturite">Maturité</label>
+                <select class="form-control" id="maturite" name="Maturite">
+                    <option value="">Sélectionner</option>
+                    <option value="3M">3 Mois</option>
+                    <option value="6M">6 Mois</option>
+                    <option value="12M">12 Mois</option>
+                </select>
+            </div>
+
+            <!-- Achat/Vente -->
+            <div class="col-md-2">
+                <label>Type</label>
+                <div class="btn-group d-flex" role="group">
+                    <input type="radio" class="btn-check" id="achat" name="TransactionType" value="Achat">
+                    <label class="btn btn-outline-primary w-50" for="achat">Achat</label>
+
+                    <input type="radio" class="btn-check" id="vente" name="TransactionType" value="Vente">
+                    <label class="btn btn-outline-primary w-50" for="vente">Vente</label>
+                </div>
+            </div>
+
+            <!-- Langue Dropdown -->
+            <div class="col-md-2">
+                <label for="langue">Langue</label>
+                <select class="form-control" id="langue" name="Langue">
+                    <option value="">Sélectionner</option>
+                    <option value="fr">Français</option>
+                    <option value="en">English</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Search Button -->
+        <div class="mt-3 text-end">
+            <button type="submit" class="btn btn-primary">Rechercher</button>
+        </div>
+    </form>
+</div>
+
+
+/* Container Styling */
+.search-container {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-.language li a {
-  display: block; /* Make the anchor fill the list item */
-  padding: 8px 12px; /* Add padding for spacing */
-  text-decoration: none; /* Remove underlines from links */
-  color: #333; /* Default text color */
-  font-size: 14px; /* Adjust font size as needed */
+/* Form Row Spacing */
+.search-container .row {
+    margin-bottom: 15px;
 }
 
-.language li a.active,
-.language li.active a { /* Apply active style to link or li */
-  background-color: #4CAF50; /* Green background for active */
-  color: white; /* White text for active */
+/* Dropdown Styling */
+.search-container select,
+.search-container input[type="radio"] {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
 }
 
-.language li a:hover {
-  background-color: #f0f0f0; /* Light gray on hover */
+/* Label Styling */
+.search-container label {
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+/* Button Group for Achat/Vente */
+.btn-group .btn {
+    font-weight: 600;
+}
+
+/* Submit Button */
+.search-container .btn-primary {
+    padding: 8px 20px;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .search-container .row > div {
+        margin-bottom: 10px;
+    }
 }
