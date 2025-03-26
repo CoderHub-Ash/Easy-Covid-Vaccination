@@ -1,74 +1,111 @@
-if (
-  !this.publication.hasOwnProperty('coreBenchmark') ||
-  !this.publication.coreBenchmark ||  // This checks both '' and undefined
-  (Array.isArray(this.publication.otherBenchmark) && this.publication.otherBenchmark.length > 0)
-) {
-  // Your logic here
+Here's a solution to create a similar dropdown menu using HTML, CSS, and JavaScript:
+
+```html
+<div class="dropdown-container">
+  <!-- First dropdown section -->
+  <div class="dropdown-section">
+    <div class="dropdown-header" onclick="toggleDropdown('section1')">
+      ENGLISH
+      <span class="arrow">▼</span>
+    </div>
+    <div class="dropdown-content" id="section1">
+      <ul>
+        <li>PRIIPs, KID</li>
+        <li>FX PND-FX SYMPHOT/PULS</li>
+        <li>CONTACT US</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Second dropdown section -->
+  <div class="dropdown-section">
+    <div class="dropdown-header" onclick="toggleDropdown('section2')">
+      2025 website
+      <span class="arrow">▼</span>
+    </div>
+    <div class="dropdown-content" id="section2">
+      <p><strong>Image 2025-02-17-16:15</strong></p>
+      <p><strong>image 2025-02-17-16:15</strong></p>
+      <p>17/Feb/25 11:45 AM</p>
+      <p>88 KB</p>
+      <p>17/Feb/25 11:46 AM</p>
+      <p>73 KB</p>
+    </div>
+  </div>
+</div>
+
+<style>
+.dropdown-container {
+  border: 2px solid #cc0000;
+  border-radius: 8px;
+  padding: 10px;
+  width: 300px;
 }
 
-
-var registriesToInsert = dataFromExcel
-    .Where(x => x.BloombergCode != null && x.MdsCode != null)
-    .Select(d => new TickerInfoDTO
-    {
-        TickerName = d.TickerName,
-        BloombergCode = d.BloombergCode,
-        MdsCode = d.MdsCode,
-        LaunchDate = DateTime.TryParseExact(
-            d.LaunchDate, 
-            "dd/MM/yyyy", // Adjust this based on your actual date format
-            CultureInfo.InvariantCulture, 
-            DateTimeStyles.None, 
-            out DateTime parsedDate
-        ) ? parsedDate : (DateTime?)null,
-        Currency = new CurrencyDTO
-        {
-            Name = d.Currency == null ? defaultCurrency : d.Currency
-        }
-    });
-
-LaunchDate = DateTime.TryParseExact(
-    d.LaunchDate, 
-    "dd/MM/yyyy HH:mm:ss",
-    CultureInfo.InvariantCulture, 
-    DateTimeStyles.None, 
-    out DateTime parsedDate
-) ? parsedDate.Date : (DateTime?)null;
-
-UPDATE ProductImportConfiguration
-SET LaunchDate = CASE 
-    WHEN BloombergCode = 'BNPIHELS Index' THEN '2016-12-09'
-    WHEN BloombergCode = 'EU_SOBK2020' THEN '2020-05-15'
-    WHEN BloombergCode = 'EU_BNPIWEBI_PROTECTED_80' THEN '2021-11-30'
-    WHEN BloombergCode = 'EU_SOTF2020' THEN '2020-06-17'
-    WHEN BloombergCode = 'EU_EWCC5VT' THEN '2021-07-12'
-END
-WHERE BloombergCode IN ('BNPIHELS Index', 'EU_SOBK2020', 'EU_BNPIWEBI_PROTECTED_80', 'EU_SOTF2020', 'EU_EWCC5VT');
-
-
-
-$.ajax({
-    url: url,
-    type: "POST",   // Explicitly define the request type
-    dataType: "json", // Ensure dataType is a string (e.g., "json", "html", "text")
-    success: function (data) {
-        var navigationUrl = getNavigationUrl($(location).attr("search"));
-        if (!navigationUrl) {  // Use !navigationUrl instead of comparing with undefined
-            $(location).attr("href", "/defaultPage");
-        } else {
-            $(location).attr("href", navigationUrl);
-        }
-    },
-    error: function (xhr) { // Handle errors properly
-        if (xhr.status == 500) {
-            $(location).attr("href", "/error500");
-        } else if (xhr.status == 404) {
-            $(location).attr("href", "/errorNotFound");
-        }
-    }
-});
-
-displayAggregationTicker(option?: any): string {
-  console.log('displayAggregationTicker called with:', option);
-  return option && typeof option === 'object' ? option.bbgCode : (option || '');
+.dropdown-header {
+  padding: 10px;
+  cursor: pointer;
+  color: #cc0000;
+  font-weight: bold;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
+
+.dropdown-content {
+  display: none;
+  padding: 10px;
+  border-top: 1px solid #eee;
+}
+
+.dropdown-content ul {
+  list-style-type: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.dropdown-content li {
+  padding: 5px 0;
+}
+
+.arrow {
+  font-size: 0.8em;
+}
+
+.dropdown-content.show {
+  display: block;
+  animation: fadeIn 0.3s;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+</style>
+
+<script>
+function toggleDropdown(sectionId) {
+  const content = document.getElementById(sectionId);
+  const arrow = content.previousElementSibling.querySelector('.arrow');
+  
+  content.classList.toggle('show');
+  arrow.textContent = content.classList.contains('show') ? '▲' : '▼';
+}
+</script>
+```
+
+Key features:
+1. Red border container matching the BNP Paribas Fortis style
+2. Collapsible sections with animated arrows
+3. Similar content structure with bold text and lists
+4. Responsive design
+5. Smooth animations
+
+To customize:
+- Adjust colors by changing the `#cc0000` values
+- Modify widths in the `.dropdown-container`
+- Adjust padding/margins for spacing
+- Change font sizes/styles as needed
+- Add more sections by duplicating the `dropdown-section` div
+
+You can add more styling to match your exact brand guidelines by modifying the CSS variables and properties. The JavaScript handles the toggle functionality with smooth transitions.
