@@ -1,32 +1,53 @@
-foreach (var portion in paragraph.Portions)
+// Store paragraph indices where the placeholder appears
+var paraIndexToReplace = -1;
+
+for (int i = 0; i < textFrame.Paragraphs.Count; i++)
 {
-    existingText = portion.Text;
+    var paragraph = textFrame.Paragraphs[i];
 
-    if (existingText.Contains("[UNDERLYING_BULLET_POINTS]"))
+    for (int j = 0; j < paragraph.Portions.Count; j++)
     {
-        var bulletText = replaceText.ReplacePlaceholderWithValue("[UNDERLYING_BULLET_POINTS]", brochureData, strategyMdsCode, productCharacteristics.Where(bd => bd.IsBenchmark == false).FirstOrDefault());
+        var portion = paragraph.Portions[j];
+        string existingText = portion.Text;
 
-        var bulletPoints = bulletText.Split(new[] { "\n", "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
-        paragraph.Portions.Clear(); // Remove the original portion
-
-        foreach (var bullet in bulletPoints)
+        if (existingText.Contains("[UNDERLYING_BULLET_POINTS]"))
         {
-            var newPara = new Paragraph();
-            newPara.ParagraphFormat.Bullet.Type = BulletType.Symbol;
-            newPara.ParagraphFormat.Bullet.Character = Convert.ToChar(8226); // •
-            newPara.ParagraphFormat.Bullet.Font = new FontData("Arial");
+            // Store index to replace after loop
+            paraIndexToReplace = i;
 
-            var newPortion = new Portion(bullet.Trim());
-            newPara.Portions.Add(newPortion);
+            // Replace text now to prepare bullet strings
+            string bulletText = replaceText.ReplacePlaceholderWithValue("[UNDERLYING_BULLET_POINTS]", brochureData, strategyMdsCode, productCharacteristics.Where(bd => !bd.IsBenchmark).FirstOrDefault());
 
-            textFrame.Paragraphs.Add(newPara);
+            var bulletPoints = bulletText.Split(new[] { "\n", "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+
+            // Create new bullet paragraphs
+            var newBulletParagraphs = new List<Paragraph>();
+
+            foreach (var bullet in bulletPoints)
+            {
+                var newPara = new Paragraph();
+                newPara.ParagraphFormat.Bullet.Type = BulletType.Symbol;
+                newPara.ParagraphFormat.Bullet.Font = new FontData("Arial");
+
+                var newPortion = new Portion(bullet.Trim());
+                newPara.Portions.Add(newPortion);
+
+                newBulletParagraphs.Add(newPara);
+            }
+
+            // Replace the original paragraph AFTER the loop
+            textFrame.Paragraphs.RemoveAt(paraIndexToReplace);
+            foreach (var bp in newBulletParagraphs)
+            {
+                textFrame.Paragraphs.Insert(paraIndexToReplace++, bp);
+            }
+
+            // Exit inner loop early
+            break;
         }
+    }
 
-        break; // exit the portion loop once replaced
-    }
-    else
-    {
-        updatedText = replaceText.ReplacePlaceholderWithValue(existingText, brochureData, strategyMdsCode, productCharacteristics.Where(bd => bd.IsBenchmark == false).FirstOrDefault());
-        portion.Text = updatedText;
-    }
+    // Exit outer loop early if we replaced it
+    if (paraIndexToReplace != -1)
+        break;
 }
